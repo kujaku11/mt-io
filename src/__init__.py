@@ -1,9 +1,10 @@
-"""Top-level package for MTH5."""
+"""Top-level package for mt-io."""
 
 # =============================================================================
 # Imports
 # =============================================================================
 import sys
+import xarray as xr
 from loguru import logger
 
 from io.reader import read_file
@@ -12,7 +13,7 @@ from io.reader import read_file
 # Package Variables
 # =============================================================================
 
-__author__ = """MTH5 Development Team"""
+__author__ = """MT-IO Development Team"""
 __email__ = "jpeacock@usgs.gov"
 __version__ = "0.0.1"
 
