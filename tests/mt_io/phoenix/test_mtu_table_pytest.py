@@ -13,6 +13,13 @@ import struct
 from pathlib import Path
 
 import pytest
+
+# Check if pytest-benchmark is available
+try:
+    import pytest_benchmark
+    HAS_BENCHMARK = True
+except ImportError:
+    HAS_BENCHMARK = False
 from mth5_test_data import get_test_data_path
 
 from mth5.io.phoenix.readers.mtu.mtu_table import MTUTable
@@ -925,6 +932,7 @@ class TestMTUTableParallelSafety:
 # =============================================================================
 
 
+@pytest.mark.skipif(not HAS_BENCHMARK, reason="pytest-benchmark not installed")
 @pytest.mark.benchmark
 class TestMTUTablePerformance:
     """Performance tests (marked with benchmark for optional execution)."""

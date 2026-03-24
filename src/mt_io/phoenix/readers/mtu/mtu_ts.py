@@ -58,7 +58,7 @@ import numpy as np
 from loguru import logger
 from mt_metadata.common import MTime
 
-from mth5.timeseries import ChannelTS, RunTS
+from timeseries import ChannelTS, RunTS
 
 from .mtu_table import MTUTable
 

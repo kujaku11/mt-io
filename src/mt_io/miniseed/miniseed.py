@@ -15,7 +15,7 @@ from pathlib import Path
 
 from obspy import read as obspy_read
 
-from mth5.timeseries import RunTS
+from timeseries import RunTS
 
 
 # =============================================================================

@@ -13,7 +13,7 @@ from collections import OrderedDict
 from loguru import logger
 
 from mth5.mth5 import MTH5
-from mth5.timeseries import RunTS
+from timeseries import RunTS
 
 
 # =============================================================================

@@ -23,7 +23,7 @@ from .readers import (
 
 
 if TYPE_CHECKING:
-    from mth5.timeseries import ChannelTS, RunTS
+    from timeseries import ChannelTS, RunTS
 
 
 # =============================================================================

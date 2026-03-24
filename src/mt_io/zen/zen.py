@@ -38,9 +38,9 @@ from mt_metadata.timeseries.filters import (
     FrequencyResponseTableFilter,
 )
 
-from mth5.io.zen import Z3DHeader, Z3DMetadata, Z3DSchedule
-from mth5.io.zen.coil_response import CoilResponse
-from mth5.timeseries import ChannelTS
+from mt_io.zen import Z3DHeader, Z3DMetadata, Z3DSchedule
+from mt_io.zen.coil_response import CoilResponse
+from timeseries import ChannelTS
 
 
 # ==============================================================================

@@ -20,8 +20,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from mth5.io.usgs_ascii import AsciiMetadata
-from mth5.timeseries import ChannelTS, RunTS
+from mt_io.usgs_ascii import AsciiMetadata
+from timeseries import ChannelTS, RunTS
 
 
 # =============================================================================

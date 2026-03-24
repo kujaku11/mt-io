@@ -22,8 +22,8 @@ from typing import Any
 import numpy as np
 from mt_metadata.common.mttime import MTime
 
-from mth5.io.phoenix.readers import TSReaderBase
-from mth5.timeseries import ChannelTS
+from mt_io.phoenix.readers import TSReaderBase
+from timeseries import ChannelTS
 
 
 # =============================================================================
