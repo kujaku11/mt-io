@@ -58,7 +58,7 @@ from typing import Any, Callable
 
 from loguru import logger
 
-from io import lemi, metronix, miniseed, nims, phoenix, usgs_ascii, zen
+from mt_io import lemi, metronix, miniseed, nims, phoenix, usgs_ascii, zen
 
 
 # =============================================================================

@@ -18,7 +18,7 @@ from unittest.mock import Mock, mock_open, patch
 # =============================================================================
 import pytest
 
-from mth5.io.zen import zen_tools
+from mt_io.zen import zen_tools
 
 
 # =============================================================================

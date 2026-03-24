@@ -7,7 +7,7 @@ import sys
 import xarray as xr
 from loguru import logger
 
-from io.reader import read_file
+from mt_io.reader import read_file
 
 # =============================================================================
 # Package Variables
