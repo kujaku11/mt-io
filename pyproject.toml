@@ -8,7 +8,7 @@ version = "0.0.1"
 description = "Readers for various magnetotelluric data file types from various data loggers"
 authors = [
     {name = "Jared Peacock", email = "jpeacock@usgs.gov"},
-    {name = "MT-IO Team"}
+    {name = "MTH5 Team"}
 ]
 readme = "README.md"
 license = {text = "CC0 1.0 Universal"}
