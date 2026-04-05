@@ -26,7 +26,7 @@ from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries import Run, Station
 
 from mt_io.lemi import LEMI424, read_lemi424
-from timeseries import RunTS
+from mt_timeseries import RunTS
 
 
 # ==============================================================================

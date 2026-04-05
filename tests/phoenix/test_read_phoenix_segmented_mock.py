@@ -26,7 +26,7 @@ from mth5.io.phoenix.readers.segmented.decimated_segmented_reader import (
     Segment,
     SubHeader,
 )
-from mth5.timeseries import ChannelTS
+from mt_timeseries import ChannelTS
 
 
 try:
@@ -458,11 +458,14 @@ class TestSegment:
         mock_start_time = MTime(time_stamp="2021-04-27T03:24:42+00:00")
         mock_segment.sample_rate = 24000
 
-        with patch.object(
-            type(mock_segment), "gps_time_stamp", new_callable=PropertyMock
-        ) as mock_gps, patch.object(
-            type(mock_segment), "n_samples", new_callable=PropertyMock
-        ) as mock_n_samples:
+        with (
+            patch.object(
+                type(mock_segment), "gps_time_stamp", new_callable=PropertyMock
+            ) as mock_gps,
+            patch.object(
+                type(mock_segment), "n_samples", new_callable=PropertyMock
+            ) as mock_n_samples,
+        ):
             mock_gps.return_value = mock_start_time
             mock_n_samples.return_value = 48000
 
@@ -926,11 +929,14 @@ class TestSegmentedReaderEdgeCases:
 
         mock_start_time = MTime(time_stamp="2021-04-27T03:24:42+00:00")
 
-        with patch.object(
-            type(segment), "gps_time_stamp", new_callable=PropertyMock
-        ) as mock_gps, patch.object(
-            type(segment), "n_samples", new_callable=PropertyMock
-        ) as mock_n_samples:
+        with (
+            patch.object(
+                type(segment), "gps_time_stamp", new_callable=PropertyMock
+            ) as mock_gps,
+            patch.object(
+                type(segment), "n_samples", new_callable=PropertyMock
+            ) as mock_n_samples,
+        ):
             mock_gps.return_value = mock_start_time
             mock_n_samples.return_value = n_samples
 

@@ -24,7 +24,7 @@ import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
 from mt_io.phoenix.readers import TSReaderBase
-from timeseries import ChannelTS
+from mt_timeseries import ChannelTS
 
 
 AD_IN_AD_UNITS = 0

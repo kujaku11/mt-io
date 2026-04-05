@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 
 from mt_io.usgs_ascii import AsciiMetadata
-from timeseries import ChannelTS, RunTS
+from mt_timeseries import ChannelTS, RunTS
 
 
 # =============================================================================

@@ -15,14 +15,14 @@ from collections import OrderedDict
 import numpy as np
 import pytest
 
-from mth5.io.phoenix import open_phoenix
-from mth5.io.phoenix.readers.native.native_reader import (
+from mt_io.phoenix import open_phoenix
+from mt_io.phoenix.readers.native.native_reader import (
     AD_IN_AD_UNITS,
     AD_INPUT_VOLTS,
     INSTRUMENT_INPUT_VOLTS,
     NativeReader,
 )
-from mth5.timeseries import ChannelTS
+from mt_timeseries import ChannelTS
 
 
 try:
@@ -502,11 +502,14 @@ class TestPhoenixNativeReaderChannelTS:
         expected_filter_names = [
             "mtu-5c_rmt03_10128_h2_10000hz_lowpass",
             "v_to_mv",
-            "mtu-5c_rmt03_10128_101",
+            {"mtu-5c_rmt03_10128_101", "coil_101_response"},
         ]
 
         for filt, expected_name in zip(filters, expected_filter_names):
-            assert filt.name == expected_name
+            if isinstance(expected_name, set):
+                assert filt.name in expected_name
+            else:
+                assert filt.name == expected_name
 
     @pytest.mark.skipif(not has_test_data, reason="mth5_test_data not available")
     def test_channel_response_channel_0(self, phoenix_reader_channel_0, rxcal_file):

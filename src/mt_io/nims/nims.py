@@ -42,7 +42,7 @@ import pandas as pd
 from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries import Auxiliary, Electric, Magnetic, Run, Station
 
-from mth5 import timeseries
+import mt_timeseries as timeseries
 from mth5.io.nims.gps import GPS
 from mth5.io.nims.header import NIMSHeader
 from mth5.io.nims.response_filters import Response

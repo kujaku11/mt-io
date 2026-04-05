@@ -15,7 +15,7 @@ import numpy as np
 import pytest
 from mth5_test_data import get_test_data_path
 
-from mth5.io.phoenix.readers.mtu.mtu_ts import MTUTSN
+from mt_io.phoenix.readers.mtu.mtu_ts import MTUTSN
 
 
 # =============================================================================
@@ -239,9 +239,7 @@ class TestSign24Conversion:
 
     def test_sign24_array(self, empty_reader):
         """Test get_sign24 with numpy array."""
-        input_array = np.array(
-            [0, 1, 2**23 - 1, 2**23, 2**24 - 1], dtype=np.int32
-        )
+        input_array = np.array([0, 1, 2**23 - 1, 2**23, 2**24 - 1], dtype=np.int32)
         expected = np.array([0, 1, 2**23 - 1, -(2**23), -1], dtype=np.int32)
         result = empty_reader.get_sign24(input_array)
         np.testing.assert_array_equal(result, expected)
@@ -661,7 +659,7 @@ class TestToRunTS:
         run_ts = reader.to_runts(table_filepath=sample_tbl_file)
 
         # Verify RunTS object is created
-        from mth5.timeseries import RunTS
+        from mt_timeseries import RunTS
 
         assert isinstance(run_ts, RunTS)
 
@@ -671,7 +669,7 @@ class TestToRunTS:
         # Should auto-detect 1690C16C.TBL from 1690C16C.TS3
         run_ts = reader.to_runts()
 
-        from mth5.timeseries import RunTS
+        from mt_timeseries import RunTS
 
         assert isinstance(run_ts, RunTS)
 
@@ -680,7 +678,7 @@ class TestToRunTS:
         reader = MTUTSN(sample_ts3_file)
         run_ts = reader.to_runts(sample_tbl_file)
 
-        from mth5.timeseries import RunTS
+        from mt_timeseries import RunTS
 
         assert isinstance(run_ts, RunTS)
         assert hasattr(run_ts, "channels")

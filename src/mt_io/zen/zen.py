@@ -40,7 +40,7 @@ from mt_metadata.timeseries.filters import (
 
 from mt_io.zen import Z3DHeader, Z3DMetadata, Z3DSchedule
 from mt_io.zen.coil_response import CoilResponse
-from timeseries import ChannelTS
+from mt_timeseries import ChannelTS
 
 
 # ==============================================================================

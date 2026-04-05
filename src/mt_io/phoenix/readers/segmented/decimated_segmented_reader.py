@@ -25,7 +25,7 @@ import numpy as np
 from mt_metadata.common.mttime import MTime
 
 from mt_io.phoenix.readers import TSReaderBase
-from timeseries import ChannelTS
+from mt_timeseries import ChannelTS
 
 
 # =============================================================================

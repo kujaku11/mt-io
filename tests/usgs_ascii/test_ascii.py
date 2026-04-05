@@ -21,8 +21,8 @@ import pandas as pd
 # =============================================================================
 import pytest
 
-from mth5.io.usgs_ascii import read_ascii, USGSascii
-from mth5.timeseries import ChannelTS, RunTS
+from mt_io.usgs_ascii import read_ascii, USGSascii
+from mt_timeseries import ChannelTS, RunTS
 
 
 try:

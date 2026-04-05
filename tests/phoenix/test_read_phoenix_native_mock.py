@@ -25,7 +25,7 @@ from mth5.io.phoenix.readers.native.native_reader import (
     INSTRUMENT_INPUT_VOLTS,
     NativeReader,
 )
-from mth5.timeseries import ChannelTS
+from mt_timeseries import ChannelTS
 
 
 try:
