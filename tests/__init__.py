@@ -1,1 +1,1 @@
-"""Unit test package for mt-io."""
+"""Unit test package for mt_io"""
