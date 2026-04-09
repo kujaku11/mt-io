@@ -25,8 +25,8 @@ from typing import Any, Union
 
 import pandas as pd
 
-from mth5.io.collection import Collection
-from mth5.io.metronix import ATSS
+from mt_io.collection import Collection
+from mt_io.metronix import ATSS
 
 
 # =============================================================================
@@ -55,7 +55,7 @@ class MetronixCollection(Collection):
 
     Examples
     --------
-    >>> from mth5.io.metronix import MetronixCollection
+    >>> from mt_io.metronix import MetronixCollection
     >>> collection = MetronixCollection("/path/to/metronix/files")
     >>> df = collection.to_dataframe(sample_rates=[128, 256])
     """
@@ -200,7 +200,7 @@ class MetronixCollection(Collection):
             return df
 
         for row in df.itertuples():
-            df.loc[
-                row.Index, "run"
-            ] = f"sr{row.sample_rate:.0f}_{int(row.run.split('_')[1]):0{zeros}}"
+            df.loc[row.Index, "run"] = (
+                f"sr{row.sample_rate:.0f}_{int(row.run.split('_')[1]):0{zeros}}"
+            )
         return df

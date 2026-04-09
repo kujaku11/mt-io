@@ -23,7 +23,7 @@ Binary data contamination is automatically cleaned during parsing.
 
 Examples
 --------
->>> from mth5.io.nims.gps import GPS
+>>> from mt_io.nims.gps import GPS
 >>> gps_string = "GPRMC,183511,A,3443.6098,N,11544.1007,W,000.0,000.0,260919,013.1,E*"
 >>> gps = GPS(gps_string)
 >>> print(f"Latitude: {gps.latitude}, Longitude: {gps.longitude}")

@@ -108,7 +108,7 @@ class Z3DSchedule:
     --------
     Read schedule from file path:
 
-    >>> from mth5.io.zen import Z3DSchedule
+    >>> from mt_io.zen import Z3DSchedule
     >>> from pathlib import Path
     >>>
     >>> # Using filename

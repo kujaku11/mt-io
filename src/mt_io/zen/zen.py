@@ -106,7 +106,7 @@ class Z3D:
 
     Examples
     --------
-    >>> from mth5.io.zen import Z3D
+    >>> from mt_io.zen import Z3D
     >>> z3d = Z3D(r"/path/to/data/station_20150522_080000_256_EX.Z3D")
     >>> z3d.read_z3d()
     >>> print(f"Found {z3d.gps_stamps.shape[0]} GPS time stamps")

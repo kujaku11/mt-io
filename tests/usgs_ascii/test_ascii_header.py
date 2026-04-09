@@ -81,8 +81,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from mth5.io.usgs_ascii import AsciiMetadata
-from mth5.utils.helpers import get_compare_dict
+from mt_io.usgs_ascii import AsciiMetadata
 
 
 try:
@@ -262,7 +261,7 @@ class TestAsciiMetadataChannels:
         """Test channel metadata structure contains expected fields."""
         channel_attr = f"{channel}_metadata"
         channel_metadata = getattr(header_data, channel_attr)
-        channel_dict = get_compare_dict(channel_metadata.to_dict(single=True))
+        channel_dict = channel_metadata.to_dict(single=True)
 
         # Test for essential fields
         assert "component" in channel_dict

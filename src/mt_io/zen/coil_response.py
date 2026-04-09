@@ -47,7 +47,7 @@ class CoilResponse:
 
     Examples
     --------
-    >>> from mth5.mth5.io.zen.coil_response import CoilResponse
+    >>> from mt_io.zen.coil_response import CoilResponse
     >>> cr = CoilResponse('amtant.cal')
     >>> fap = cr.get_coil_response_fap(1234)
     >>> print(fap.name)

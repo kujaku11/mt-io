@@ -14,8 +14,8 @@ from mt_metadata.timeseries.magnetic import Magnetic
 from mt_metadata.timeseries.run import Run
 from mt_metadata.timeseries.station import Station
 
-from mth5.io.phoenix.readers.base import TSReaderBase
-from mth5.io.phoenix.readers.receiver_metadata import PhoenixReceiverMetadata
+from mt_io.phoenix.readers.base import TSReaderBase
+from mt_io.phoenix.readers.receiver_metadata import PhoenixReceiverMetadata
 
 
 @pytest.fixture(scope="module")

@@ -24,8 +24,8 @@ from pathlib import Path
 import pytest
 from mt_metadata.common import Comment, MTime
 
-from mth5.io.nims import NIMSHeader
-from mth5.io.nims.header import NIMSError
+from mt_io.nims import NIMSHeader
+from mt_io.nims.header import NIMSError
 
 
 # =============================================================================

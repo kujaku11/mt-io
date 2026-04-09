@@ -40,7 +40,7 @@ Then add your reader to the readers dictionary for automatic detection.
 
 See Also
 --------
-Existing readers in `mth5.io` for implementation guidance.
+Existing readers in `mt_io` for implementation guidance.
 
 Created on Wed Aug 26 10:32:45 2020
 

@@ -22,7 +22,7 @@ except ImportError:
     HAS_BENCHMARK = False
 from mth5_test_data import get_test_data_path
 
-from mth5.io.phoenix.readers.mtu.mtu_table import MTUTable
+from mt_io.phoenix.readers.mtu.mtu_table import MTUTable
 
 
 # =============================================================================

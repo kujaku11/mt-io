@@ -102,7 +102,7 @@ class Z3DHeader:
 
     Examples
     --------
-    >>> from mth5.io.zen import Z3DHeader
+    >>> from mt_io.zen import Z3DHeader
     >>> Z3Dfn = r"/home/mt/mt01/mt01_20150522_080000_256_EX.Z3D"
     >>> header_obj = Z3DHeader(fn=Z3Dfn)
     >>> header_obj.read_header()

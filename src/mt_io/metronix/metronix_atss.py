@@ -31,7 +31,7 @@ point numbers in binary format, making them efficient for large datasets.
 
 Examples
 --------
->>> from mth5.io.metronix.metronix_atss import ATSS, read_atss
+>>> from mt_io.metronix.metronix_atss import ATSS, read_atss
 >>>
 >>> # Using the ATSS class directly
 >>> atss = ATSS('data/station001.atss')

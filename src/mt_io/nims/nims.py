@@ -43,9 +43,9 @@ from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries import Auxiliary, Electric, Magnetic, Run, Station
 
 import mt_timeseries as timeseries
-from mth5.io.nims.gps import GPS
-from mth5.io.nims.header import NIMSHeader
-from mth5.io.nims.response_filters import Response
+from mt_io.nims.gps import GPS
+from mt_io.nims.header import NIMSHeader
+from mt_io.nims.response_filters import Response
 
 
 # =============================================================================
@@ -113,7 +113,7 @@ class NIMS(NIMSHeader):
 
     Examples
     --------
-    >>> from mth5.io.nims import nims
+    >>> from mt_io.nims import nims
     >>> n = nims.NIMS(r"/home/mt_data/nims/mt001.bin")
     >>> n.read_nims()
     """
@@ -1209,7 +1209,7 @@ class NIMS(NIMSHeader):
 
         Examples
         --------
-        >>> from mth5.io import nims
+        >>> from mt_io import nims
         >>> n = nims.NIMS(r"/home/mt_data/nims/mt001.bin")
         >>> n.read_nims()
         """
@@ -1521,7 +1521,7 @@ def read_nims(fn: Union[str, Path]) -> Optional[timeseries.RunTS]:
 
     Examples
     --------
-    >>> from mth5.io.nims import nims
+    >>> from mt_io.nims import nims
     >>> run_ts = nims.read_nims("/path/to/data.bin")
     """
 

@@ -14,7 +14,7 @@ import pytest
 from mt_metadata.timeseries import Electric, Magnetic
 from mt_metadata.timeseries.filters import ChannelResponse, FrequencyResponseTableFilter
 
-from mth5.io.metronix import MetronixChannelJSON, MetronixFileNameMetadata
+from mt_io.metronix import MetronixChannelJSON, MetronixFileNameMetadata
 
 
 # =============================================================================

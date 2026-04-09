@@ -19,8 +19,8 @@ from typing import List
 # =============================================================================
 import pandas as pd
 
-from mth5.io.collection import Collection
-from mth5.io.lemi import LEMI424
+from mt_io.collection import Collection
+from mt_io.lemi import LEMI424
 
 
 # =============================================================================
@@ -60,7 +60,7 @@ class LEMICollection(Collection):
 
     Examples
     --------
-    >>> from mth5.io.lemi import LEMICollection
+    >>> from mt_io.lemi import LEMICollection
     >>> lc = LEMICollection(r"/path/to/single/lemi/station")
     >>> lc.station_id = "mt001"
     >>> lc.survey_id = "test_survey"
@@ -99,7 +99,7 @@ class LEMICollection(Collection):
 
         Examples
         --------
-        >>> from mth5.io.lemi import LEMICollection
+        >>> from mt_io.lemi import LEMICollection
         >>> lc = LEMICollection("/path/to/single/lemi/station")
         >>> cal_dict = lc.get_calibrations(Path("/path/to/calibrations"))
         """
@@ -141,7 +141,7 @@ class LEMICollection(Collection):
 
         Examples
         --------
-        >>> from mth5.io.lemi import LEMICollection
+        >>> from mt_io.lemi import LEMICollection
         >>> lc = LEMICollection("/path/to/single/lemi/station")
         >>> lemi_df = lc.to_dataframe()
         """

@@ -15,8 +15,8 @@ Created on Wed Aug 31 10:32:44 2022
 # =============================================================================
 import pandas as pd
 
-from mth5.io.collection import Collection
-from mth5.io.usgs_ascii import USGSascii
+from mt_io.collection import Collection
+from mt_io.usgs_ascii import USGSascii
 
 
 # =============================================================================
@@ -28,7 +28,7 @@ class USGSasciiCollection(Collection):
 
     .. code-block:: python
 
-        >>> from mth5.io.usgs_ascii import USGSasciiCollection
+        >>> from mt_io.usgs_ascii import USGSasciiCollection
         >>> lc = USGSasciiCollection(r"/path/to/ascii/files")
         >>> run_dict = lc.get_runs(1)
 
@@ -58,7 +58,7 @@ class USGSasciiCollection(Collection):
 
         :Example:
 
-            >>> from mth5.io.usgs_ascii import USGSasciiCollection
+            >>> from mt_io.usgs_ascii import USGSasciiCollection
             >>> lc = USGSasciiCollection("/path/to/ascii/files")
             >>> ascii_df = lc.to_dataframe()
 

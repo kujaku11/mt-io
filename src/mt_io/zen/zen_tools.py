@@ -18,7 +18,7 @@ import dateutil.parser
 import numpy as np
 from loguru import logger
 
-from mth5.io.zen import Z3D
+from mt_io.zen import Z3D
 
 
 try:

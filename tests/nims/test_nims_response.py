@@ -34,8 +34,8 @@ from mt_metadata.timeseries.filters import (
     TimeDelayFilter,
 )
 
-from mth5.io.nims import Response
-from mth5.io.nims.response_filters import ResponseError
+from mt_io.nims import Response
+from mt_io.nims.response_filters import ResponseError
 
 
 # =============================================================================

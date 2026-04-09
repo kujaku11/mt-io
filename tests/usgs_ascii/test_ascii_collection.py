@@ -65,7 +65,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from mth5.io.usgs_ascii import USGSasciiCollection
+from mt_io.usgs_ascii import USGSasciiCollection
 
 
 try:

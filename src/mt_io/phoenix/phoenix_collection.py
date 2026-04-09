@@ -17,8 +17,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from mth5.io import Collection
-from mth5.io.phoenix import open_phoenix, PhoenixReceiverMetadata
+from mt_io import Collection
+from mt_io.phoenix import open_phoenix, PhoenixReceiverMetadata
 
 
 # =============================================================================
@@ -49,7 +49,7 @@ class PhoenixCollection(Collection):
     --------
     Create a collection from a station directory:
 
-    >>> from mth5.io.phoenix import PhoenixCollection
+    >>> from mt_io.phoenix import PhoenixCollection
     >>> collection = PhoenixCollection(r"/path/to/station")
     >>> runs = collection.get_runs(sample_rates=[150, 24000])
     >>> print(runs.keys())
@@ -76,8 +76,8 @@ class PhoenixCollection(Collection):
 
     See Also
     --------
-    mth5.io.Collection : Base collection class
-    mth5.io.phoenix.PhoenixReceiverMetadata : Receiver metadata handler
+    mt_io.Collection : Base collection class
+    mt_io.phoenix.PhoenixReceiverMetadata : Receiver metadata handler
 
     """
 
@@ -270,9 +270,9 @@ class PhoenixCollection(Collection):
         for folder in station_folders:
             rec_fn = folder.joinpath(self._receiver_metadata_name)
             receiver_metadata = self._read_receiver_metadata_json(rec_fn)
-            self.metadata_dict[
-                receiver_metadata.station_metadata.id
-            ] = receiver_metadata
+            self.metadata_dict[receiver_metadata.station_metadata.id] = (
+                receiver_metadata
+            )
 
             for sr in sample_rates:
                 for fn in folder.rglob(f"*{self._file_extension_map[int(sr)]}"):
@@ -436,9 +436,9 @@ class PhoenixCollection(Collection):
                         "start",
                     ].unique()
                     for ii, s in enumerate(starts, 1):
-                        rdf.loc[
-                            (rdf.start == s) & (rdf.sample_rate == sr), "run"
-                        ] = f"sr{run_stem}_{ii:0{zeros}}"
+                        rdf.loc[(rdf.start == s) & (rdf.sample_rate == sr), "run"] = (
+                            f"sr{run_stem}_{ii:0{zeros}}"
+                        )
 
         return rdf
 
@@ -481,7 +481,7 @@ class PhoenixCollection(Collection):
         --------
         Get runs for standard sample rates:
 
-        >>> from mth5.io.phoenix import PhoenixCollection
+        >>> from mt_io.phoenix import PhoenixCollection
         >>> collection = PhoenixCollection(r"/path/to/station")
         >>> runs = collection.get_runs(sample_rates=[150, 24000])
         >>> print(runs.keys())
@@ -545,7 +545,7 @@ class PhoenixCollection(Collection):
         --------
         to_dataframe : Create complete file inventory
         assign_run_names : Group files into runs
-        mth5.io.phoenix.read_phoenix : Read Phoenix files
+        mt_io.phoenix.read_phoenix : Read Phoenix files
 
         """
 

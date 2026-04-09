@@ -19,7 +19,7 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pytest
 
-from mth5.io.phoenix.readers.native.native_reader import (
+from mt_io.phoenix.readers.native.native_reader import (
     AD_IN_AD_UNITS,
     AD_INPUT_VOLTS,
     INSTRUMENT_INPUT_VOLTS,

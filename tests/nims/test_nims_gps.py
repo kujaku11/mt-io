@@ -30,7 +30,7 @@ from unittest.mock import patch
 # =============================================================================
 import pytest
 
-from mth5.io.nims import GPS, GPSError
+from mt_io.nims import GPS, GPSError
 
 
 # =============================================================================

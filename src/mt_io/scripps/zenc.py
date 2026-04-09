@@ -12,7 +12,6 @@ from collections import OrderedDict
 
 from loguru import logger
 
-from mth5.mth5 import MTH5
 from mt_timeseries import RunTS
 
 
@@ -132,6 +131,9 @@ class ZENC:
 
         if channel_map is not None:
             self.channel_map = channel_map
+
+        # Lazy import keeps mt_io importable even when mth5 imports mt_io.
+        from mth5.mth5 import MTH5
 
         with MTH5() as m:
             m.open_mth5(mth5_file, mode="r")

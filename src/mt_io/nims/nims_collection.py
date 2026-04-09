@@ -20,8 +20,8 @@ from typing import Any
 
 import pandas as pd
 
-from mth5.io.collection import Collection
-from mth5.io.nims import NIMS
+from mt_io.collection import Collection
+from mt_io.nims import NIMS
 
 
 # =============================================================================
@@ -50,15 +50,15 @@ class NIMSCollection(Collection):
 
     Examples
     --------
-    >>> from mth5.io.nims import NIMSCollection
+    >>> from mt_io.nims import NIMSCollection
     >>> nc = NIMSCollection(r"/path/to/nims/station")
     >>> nc.survey_id = "mt001"
     >>> df = nc.to_dataframe()
 
     See Also
     --------
-    mth5.io.collection.Collection : Base collection class
-    mth5.io.nims.NIMS : NIMS file reader
+    mt_io.collection.Collection : Base collection class
+    mt_io.nims.NIMS : NIMS file reader
     """
 
     def __init__(self, file_path: str | Path | None = None, **kwargs: Any) -> None:
@@ -128,7 +128,7 @@ class NIMSCollection(Collection):
 
         Examples
         --------
-        >>> from mth5.io.nims import NIMSCollection
+        >>> from mt_io.nims import NIMSCollection
         >>> nc = NIMSCollection("/path/to/nims/station")
         >>> df = nc.to_dataframe(run_name_zeros=3)
         >>> print(df[['station', 'run', 'start', 'sample_rate']])
@@ -249,7 +249,7 @@ class NIMSCollection(Collection):
         Examples
         --------
         >>> import pandas as pd
-        >>> from mth5.io.nims import NIMSCollection
+        >>> from mt_io.nims import NIMSCollection
         >>> # Assuming df has columns: station, start, run, sample_rate
         >>> nc = NIMSCollection()
         >>> df_updated = nc.assign_run_names(df, zeros=3)

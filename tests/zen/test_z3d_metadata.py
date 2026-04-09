@@ -22,7 +22,7 @@ import numpy as np
 # =============================================================================
 import pytest
 
-from mth5.io.zen import Z3DMetadata
+from mt_io.zen import Z3DMetadata
 
 
 # =============================================================================

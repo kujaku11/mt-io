@@ -276,7 +276,7 @@ class Collection:
 
         :Example:
 
-            >>> from mth5.io.phoenix import PhoenixCollection
+            >>> from mt_io.phoenix import PhoenixCollection
             >>> phx_collection = PhoenixCollection(r"/path/to/station")
             >>> run_dict = phx_collection.get_runs(sample_rates=[150, 24000])
 

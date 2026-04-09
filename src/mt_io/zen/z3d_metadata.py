@@ -116,7 +116,7 @@ class Z3DMetadata:
 
     Examples
     --------
-    >>> from mth5.io.zen import Z3DMetadata
+    >>> from mt_io.zen import Z3DMetadata
     >>> Z3Dfn = r"/home/mt/mt01/mt01_20150522_080000_256_EX.Z3D"
     >>> header_obj = Z3DMetadata(fn=Z3Dfn)
     >>> header_obj.read_metadata()

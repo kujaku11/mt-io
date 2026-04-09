@@ -22,9 +22,9 @@ from typing import Any
 import pandas as pd
 from mt_metadata.timeseries import Station
 
-from mth5.io.collection import Collection
-from mth5.io.zen import Z3D
-from mth5.io.zen.coil_response import CoilResponse
+from mt_io.collection import Collection
+from mt_io.zen import Z3D
+from mt_io.zen.coil_response import CoilResponse
 
 
 # =============================================================================
@@ -352,9 +352,9 @@ class Z3DCollection(Collection):
                     (df.station == station) & (df.start == start)
                 ].sample_rate.unique()[0]
 
-                df.loc[
-                    (df.station == station) & (df.start == start), "run"
-                ] = f"sr{sample_rate:.0f}_{block_num:0{zeros}}"
+                df.loc[(df.station == station) & (df.start == start), "run"] = (
+                    f"sr{sample_rate:.0f}_{block_num:0{zeros}}"
+                )
                 df.loc[
                     (df.station == station) & (df.start == start),
                     "sequence_number",
