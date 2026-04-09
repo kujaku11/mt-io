@@ -13,9 +13,15 @@ Created on Wed Sep 30 10:20:12 2020
 # =============================================================================
 from pathlib import Path
 
+import xarray as xr
 from obspy import read as obspy_read
 
 from mt_timeseries import RunTS
+
+# Ensure sps_filters accessor exists for environments where mt_timeseries
+# does not auto-register scipy_filters on import.
+if not hasattr(xr.DataArray, "sps_filters"):
+    import mt_timeseries.scipy_filters  # noqa: F401
 
 
 # =============================================================================
