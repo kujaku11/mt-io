@@ -1,6 +1,8 @@
 # mt-io
 
-Readers for various magnetotelluric data file types from various data loggers including:
+**Version**: 0.0.1
+
+This package is meant to be a repository for readers for various magnetotelluric data file types from various data loggers including:
 
 | Data Logger | File Type | Reader | Maturity |
 |-------------|-----------|--------|----------|
@@ -16,7 +18,7 @@ Readers for various magnetotelluric data file types from various data loggers in
 | USGS ASCII | ascii | Y | medium |
 | ZEN | z3d | Y | strong |
 
-This package will read the data into either a `ChannelTS` or a `RunTS` object depending on the data included in the file.
+This package will read the data into either a `mt_timeseries.ChannelTS` or a `mt_timeseries.RunTS` object depending on the data included in the file.
 
 ## Installation
 
