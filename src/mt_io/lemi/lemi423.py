@@ -21,17 +21,18 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-from mth5.timeseries import ChannelTS, RunTS
+from mt_timeseries import ChannelTS, RunTS
 from mt_metadata.timeseries import Station, Run, Electric, Magnetic
 from mt_metadata.timeseries.filters import (
     FrequencyResponseTableFilter,
     ChannelResponse,
     CoefficientFilter,
 )
-from mt_metadata.utils.mttime import MTime
+from mt_metadata.common import MTime
 
 # File extensions (central dispatcher lower-cases extension)
 B423_EXTS = {"b423"}
+
 
 class Read_Lemi_Header:
     """
@@ -99,6 +100,7 @@ class Read_Lemi_Header:
     - **elevation** (float): Meters above sea level from line 11
     - **coefficients** (dict): All K and A coefficients (Kmx, Kmy, Kmz, Ke1, Ke2, Ax, Ay, Az, Ae1, Ae2, etc.)
     """
+
     def __init__(self, binary_file: Union[str, Path]):
         self.binary_file = str(binary_file)
         self.instrument_number = None
@@ -108,37 +110,46 @@ class Read_Lemi_Header:
         self.coefficients: Dict[str, float] = {}
 
     def _read_header(self) -> List[str]:
-        with open(self.binary_file, 'rb') as f:
-            return f.read(1024).decode(errors='ignore').splitlines()
+        with open(self.binary_file, "rb") as f:
+            return f.read(1024).decode(errors="ignore").splitlines()
 
     def _extract_instrument_number(self, header):
-        self.instrument_number = int(header[0].split('#')[-1]) if '#' in header[0] else None
+        self.instrument_number = (
+            int(header[0].split("#")[-1]) if "#" in header[0] else None
+        )
 
     def _extract_firmware_version(self, header):
         # Line 1: "%FIRMWARE Ver.2.1" -> extract "2.1"
-        if len(header) > 1 and 'FIRMWARE' in header[1]:
+        if len(header) > 1 and "FIRMWARE" in header[1]:
             parts = header[1].split()
             if len(parts) >= 2:
                 # Extract version after "Ver."
-                self.firmware_version = parts[-1].replace('Ver.', '')
+                self.firmware_version = parts[-1].replace("Ver.", "")
 
     def _extract_deployment_time(self, header):
         date, time = header[4].split()[-1], header[5].split()[-1]
         # e.g., "YYYY/MM/DD HH:MM:SS"
-        self.deployment_time = pd.to_datetime(f"{date} {time}", format="%Y/%m/%d %H:%M:%S", utc=True)
+        self.deployment_time = pd.to_datetime(
+            f"{date} {time}", format="%Y/%m/%d %H:%M:%S", utc=True
+        )
 
     def _extract_coefficients(self, header):
         self.coefficients = {
-            line.split("=")[0].strip().lstrip('%'): float(line.split("=")[1])
-            for line in header[13:] if "=" in line
+            line.split("=")[0].strip().lstrip("%"): float(line.split("=")[1])
+            for line in header[13:]
+            if "=" in line
         }
 
     def _extract_coordinates(self, header):
-        lat, lat_dir = header[9].split()[-1].split(',')
-        lon, lon_dir = header[10].split()[-1].split(',')
-        self.latitude = (int(lat[:2]) + float(lat[2:]) / 60) * (-1 if lat_dir.strip() == 'S' else 1)
-        self.longitude = (int(lon[:3]) + float(lon[3:]) / 60) * (-1 if lon_dir.strip() == 'W' else 1)
-        self.elevation = float(header[11].split(',')[0].split()[-1])
+        lat, lat_dir = header[9].split()[-1].split(",")
+        lon, lon_dir = header[10].split()[-1].split(",")
+        self.latitude = (int(lat[:2]) + float(lat[2:]) / 60) * (
+            -1 if lat_dir.strip() == "S" else 1
+        )
+        self.longitude = (int(lon[:3]) + float(lon[3:]) / 60) * (
+            -1 if lon_dir.strip() == "W" else 1
+        )
+        self.elevation = float(header[11].split(",")[0].split()[-1])
 
     def read(self) -> Dict:
         header = self._read_header()
@@ -194,24 +205,32 @@ class Read_Lemi_Data:
     pandas.DataFrame
         Time-indexed DataFrame with columns Bx, By, Bz, Ex, Ey (RAW counts, int32).
     """
-    
+
     def __init__(self, binary_file: Union[str, Path], coefficients: Dict[str, float]):
         self.binary_file = str(binary_file)
         self.coefficients = coefficients
 
     def read_dataframe(self) -> pd.DataFrame:
         # Binary: 30 bytes/sample, little-endian, 1024-byte header
-        binary_format = np.dtype([
-            ('time', '<u4'), ('tick', '<u2'),
-            ('Bx', '<i4'), ('By', '<i4'), ('Bz', '<i4'),
-            ('Ex', '<i4'), ('Ey', '<i4'),
-            ('sync', '<i1'), ('stage', '<u1'), ('CRC', '<i2'),
-        ])
-        with open(self.binary_file, 'rb') as f:
+        binary_format = np.dtype(
+            [
+                ("time", "<u4"),
+                ("tick", "<u2"),
+                ("Bx", "<i4"),
+                ("By", "<i4"),
+                ("Bz", "<i4"),
+                ("Ex", "<i4"),
+                ("Ey", "<i4"),
+                ("sync", "<i1"),
+                ("stage", "<u1"),
+                ("CRC", "<i2"),
+            ]
+        )
+        with open(self.binary_file, "rb") as f:
             f.read(1024)  # skip header
             arr = np.fromfile(f, dtype=binary_format)
         if arr.size == 0:
-            return pd.DataFrame(columns=["Bx","By","Bz","Ex","Ey"]).set_index(
+            return pd.DataFrame(columns=["Bx", "By", "Bz", "Ex", "Ey"]).set_index(
                 pd.DatetimeIndex([], tz="UTC", name="time")
             )
 
@@ -219,14 +238,16 @@ class Read_Lemi_Data:
 
         # Determine sample rate from tick counter range
         # Tick resets to 0 when timestamp increments, so max(tick) + 1 = sample rate
-        tick_max = df['tick'].max()
+        tick_max = df["tick"].max()
         self.sample_rate = float(tick_max + 1) if tick_max > 0 else None
 
-        df['time'] = pd.to_datetime(df['time'], unit='s', utc=True) + pd.to_timedelta(df['tick'], unit='ms')
-        df.set_index('time', inplace=True)
+        df["time"] = pd.to_datetime(df["time"], unit="s", utc=True) + pd.to_timedelta(
+            df["tick"], unit="ms"
+        )
+        df.set_index("time", inplace=True)
 
         # Return RAW counts (no calibration applied)
-        return df[['Bx','By','Bz','Ex','Ey']].sort_index()
+        return df[["Bx", "By", "Bz", "Ex", "Ey"]].sort_index()
 
 
 def read_lemi_coil_response(calibration_fn, coil_number=None):
@@ -250,11 +271,13 @@ def read_lemi_coil_response(calibration_fn, coil_number=None):
     # Create frequency response filter
     fap = FrequencyResponseTableFilter()
     fap.frequencies = cal_data[:, 0]  # Hz
-    fap.amplitudes = cal_data[:, 1]   # Normalized
+    fap.amplitudes = cal_data[:, 1]  # Normalized
     fap.phases = np.deg2rad(cal_data[:, 2])  # Convert degrees to radians
     fap.units_in = "nanotesla"
     fap.units_out = "millivolts"
-    fap.name = f"lemi_120_{coil_number}_response" if coil_number else "lemi_120_response"
+    fap.name = (
+        f"lemi_120_{coil_number}_response" if coil_number else "lemi_120_response"
+    )
     fap.type = "frequency response table"
     fap.calibration_date = "1970-01-01T00:00:00+00:00"  # Default
     fap.comments = f"LEMI-120 coil response from {calibration_fn.name}"
@@ -321,19 +344,21 @@ class LEMI423Reader:
     def __init__(self, files: List[Union[str, Path]], **kwargs):
         self.logger = logger
         self.files = [Path(f) for f in (files if isinstance(files, list) else [files])]
-        self.sample_rate = kwargs.get('sample_rate', None)
-        self.dipole_length_ex = kwargs.get('dipole_length_ex', 0)
-        self.dipole_length_ey = kwargs.get('dipole_length_ey', 0)
-        self.station_id = kwargs.get('station_id', None)
-        self.calibration_fn = kwargs.get('calibration_fn', None)
+        self.sample_rate = kwargs.get("sample_rate", None)
+        self.dipole_length_ex = kwargs.get("dipole_length_ex", 0)
+        self.dipole_length_ey = kwargs.get("dipole_length_ey", 0)
+        self.station_id = kwargs.get("station_id", None)
+        self.calibration_fn = kwargs.get("calibration_fn", None)
         self.data = None
         self.header = None
 
     def __str__(self):
         lines = ["LEMI-423 Reader", "-" * 20]
         if self.header:
-            lines.append(f"Instrument: LEMI-423 #{self.header.get('instrument_number', 'unknown')}")
-            firmware = self.header.get('firmware_version', '2.1')
+            lines.append(
+                f"Instrument: LEMI-423 #{self.header.get('instrument_number', 'unknown')}"
+            )
+            firmware = self.header.get("firmware_version", "2.1")
             lines.append(f"Firmware:   Ver.{firmware}")
         if self.data is not None:
             lines.append(f"Start:      {self.start.isoformat()}")
@@ -358,7 +383,7 @@ class LEMI423Reader:
         if self._has_data():
             return MTime(self.data.index[0])
         elif self.header:
-            return MTime(self.header.get('deployment_time'))
+            return MTime(self.header.get("deployment_time"))
         return None
 
     @property
@@ -379,21 +404,21 @@ class LEMI423Reader:
     def latitude(self):
         """Latitude from header in decimal degrees (WGS84)"""
         if self.header:
-            return self.header.get('latitude')
+            return self.header.get("latitude")
         return None
 
     @property
     def longitude(self):
         """Longitude from header in decimal degrees (WGS84)"""
         if self.header:
-            return self.header.get('longitude')
+            return self.header.get("longitude")
         return None
 
     @property
     def elevation(self):
         """Elevation from header in meters"""
         if self.header:
-            return self.header.get('elevation')
+            return self.header.get("elevation")
         return None
 
     def _build_station_metadata(self) -> Station:
@@ -420,7 +445,7 @@ class LEMI423Reader:
                 s.id = self.files[0].parent.name
             else:
                 # 3. Fall back to instrument number
-                instrument_num = self.header.get('instrument_number', '')
+                instrument_num = self.header.get("instrument_number", "")
                 s.id = f"LEMI{instrument_num:04d}" if instrument_num else ""
             # LEMI instruments typically use geomagnetic reference frame
             s.orientation.reference_frame = "geomagnetic"
@@ -447,11 +472,11 @@ class LEMI423Reader:
         r.data_type = "MTBB"  # Magnetotelluric Broadband
 
         if self.header:
-            instrument_num = self.header.get('instrument_number', '')
+            instrument_num = self.header.get("instrument_number", "")
             r.data_logger.id = str(instrument_num) if instrument_num else ""
 
             # Use firmware version from file header, default to "2.1" if not found
-            firmware_version = self.header.get('firmware_version', '2.1')
+            firmware_version = self.header.get("firmware_version", "2.1")
             r.data_logger.firmware.version = firmware_version
 
         if self._has_data():
@@ -513,7 +538,7 @@ class LEMI423Reader:
             ch_metadata.sensor.type = "induction coil"
             # Use instrument number as sensor ID if available
             if self.header:
-                instrument_num = self.header.get('instrument_number', '')
+                instrument_num = self.header.get("instrument_number", "")
                 ch_metadata.sensor.id = str(instrument_num) if instrument_num else ""
         else:
             ch_metadata = Electric()
@@ -547,8 +572,8 @@ class LEMI423Reader:
         data_reader = Read_Lemi_Data(path, hdr["coefficients"])
         df = data_reader.read_dataframe()
         # Add sample_rate to header if detected from tick counter
-        if hasattr(data_reader, 'sample_rate') and data_reader.sample_rate:
-            hdr['sample_rate'] = data_reader.sample_rate
+        if hasattr(data_reader, "sample_rate") and data_reader.sample_rate:
+            hdr["sample_rate"] = data_reader.sample_rate
         return df, hdr
 
     def read(self) -> RunTS:
@@ -582,22 +607,24 @@ class LEMI423Reader:
         # Concatenate on time index
         full = pd.concat(parts).sort_index()
         # Drop exact duplicates
-        full = full[~full.index.duplicated(keep='first')]
+        full = full[~full.index.duplicated(keep="first")]
 
         # Store the full dataframe
         self.data = full
 
         # Use sample rate calculated from tick counter (max_tick + 1) if available
         # Otherwise fall back to median dt calculation
-        if self.header.get('sample_rate'):
-            self.sample_rate = self.header['sample_rate']
+        if self.header.get("sample_rate"):
+            self.sample_rate = self.header["sample_rate"]
         elif len(full.index) > 1:
             dt = full.index.to_series().diff().dropna().dt.total_seconds().median()
             self.sample_rate = (1.0 / dt) if dt and dt > 0 else None
         else:
             self.sample_rate = None
 
-        self.logger.info(f"Read {len(parts)} file(s), {self.n_samples} samples at {self.sample_rate} Hz")
+        self.logger.info(
+            f"Read {len(parts)} file(s), {self.n_samples} samples at {self.sample_rate} Hz"
+        )
 
         # Build metadata objects ONCE and reuse them
         # This avoids repeated property calls and object reconstruction
@@ -630,15 +657,15 @@ class LEMI423Reader:
 
             # Get calibration coefficients from header
             if self.header:
-                coeffs = self.header.get('coefficients', {})
+                coeffs = self.header.get("coefficients", {})
 
                 # Map channel code to coefficient keys
                 coeff_map = {
-                    'hx': ('Kmx', 'Ax'),
-                    'hy': ('Kmy', 'Ay'),
-                    'hz': ('Kmz', 'Az'),
-                    'ex': ('Ke1', 'Ae1'),
-                    'ey': ('Ke2', 'Ae2'),
+                    "hx": ("Kmx", "Ax"),
+                    "hy": ("Kmy", "Ay"),
+                    "hz": ("Kmz", "Az"),
+                    "ex": ("Ke1", "Ae1"),
+                    "ey": ("Ke2", "Ae2"),
                 }
 
                 if code in coeff_map:
@@ -657,13 +684,12 @@ class LEMI423Reader:
                 # Get instrument number for coil ID
                 coil_id = None
                 if self.header:
-                    instrument_num = self.header.get('instrument_number', '')
+                    instrument_num = self.header.get("instrument_number", "")
                     coil_id = str(instrument_num) if instrument_num else None
 
                 # Read LEMI-120 coil response filter from .rsp file
                 coil_filter = read_lemi_coil_response(
-                    self.calibration_fn,
-                    coil_number=coil_id
+                    self.calibration_fn, coil_number=coil_id
                 )
                 filters_list.append(coil_filter)
 
@@ -681,7 +707,7 @@ class LEMI423Reader:
                 channel_type=ch_type,
                 data=series,
                 channel_metadata=ch_metadata,
-                run_metadata=run_meta,          # Reuse cached object
+                run_metadata=run_meta,  # Reuse cached object
                 station_metadata=station_meta,  # Reuse cached object
                 channel_response=channel_response,  # Pass ChannelResponse object
             )
@@ -691,7 +717,7 @@ class LEMI423Reader:
         return RunTS(
             array_list=ch_objs,
             station_metadata=station_meta,  # Reuse cached object
-            run_metadata=run_meta,          # Reuse cached object
+            run_metadata=run_meta,  # Reuse cached object
         )
 
 
