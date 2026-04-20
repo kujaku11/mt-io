@@ -12,7 +12,7 @@ Created on Thu Nov 7 16:00:00 2025
 # =============================================================================
 import unittest
 
-from mth5.io.uoa import read_uoa, read_orange, UoAReader, OrangeReader
+from mt_io.uoa import read_uoa, read_orange, UoAReader, OrangeReader
 
 # =============================================================================
 
@@ -43,6 +43,7 @@ class TestOrangeBoxDetection(unittest.TestCase):
     def test_detect_orange_box_function_exists(self):
         """Test that detect_orange_box function exists in reader module"""
         from mth5.io.reader import detect_orange_box
+
         self.assertTrue(callable(detect_orange_box))
 
 
