@@ -99,7 +99,7 @@ For Broadband (LEMI-120):
     ... )
 
 
-Author: 
+Author:
 
 Date: 2025-11-12
 """
@@ -117,7 +117,7 @@ from mt_metadata.timeseries.filters import (
     ChannelResponse,
     CoefficientFilter,
 )
-from mth5.timeseries import ChannelTS, RunTS
+from mt_timeseries import ChannelTS, RunTS
 
 # Setup module logger
 logger = logging.getLogger(__name__ + ".uoa.pr624")
@@ -128,19 +128,19 @@ logger = logging.getLogger(__name__ + ".uoa.pr624")
 # ==============================================================================
 
 # ADC characteristics (PR6-24 with 24-bit sigma-delta)
-ADC_FULL_SCALE_V = 8.388          # ±8.388 V full-scale range
-ADC_BITS = 24                      # 24-bit resolution
-ADC_COUNTS = 2 ** 23               # Signed range: ±2^23
+ADC_FULL_SCALE_V = 8.388  # ±8.388 V full-scale range
+ADC_BITS = 24  # 24-bit resolution
+ADC_COUNTS = 2**23  # Signed range: ±2^23
 ADC_LSB_UV = (ADC_FULL_SCALE_V / ADC_COUNTS) * 1e6  # ~1.0 μV per count
 
 # Bz voltage divider (hardware-fixed)
-BZ_DIVIDER_R_TOP = 15000.0         # 15 kΩ resistor to sensor
-BZ_DIVIDER_R_BOTTOM = 10000.0      # 10 kΩ resistor to ground
+BZ_DIVIDER_R_TOP = 15000.0  # 15 kΩ resistor to sensor
+BZ_DIVIDER_R_BOTTOM = 10000.0  # 10 kΩ resistor to ground
 BZ_DIVIDER_RATIO = BZ_DIVIDER_R_BOTTOM / (BZ_DIVIDER_R_TOP + BZ_DIVIDER_R_BOTTOM)  # 0.4
 BZ_DIVIDER_CORRECTION = 1.0 / BZ_DIVIDER_RATIO  # 2.5 (multiply to recover true voltage)
 
 # Electric field terminal box gain (hardware-fixed)
-E_TERMINAL_BOX_GAIN = 10.0         # ×10 pre-amplifier
+E_TERMINAL_BOX_GAIN = 10.0  # ×10 pre-amplifier
 
 # Bartington Mag-03 fluxgate conversion (long-period)
 # From documentation: ±10V → ±70,000 nT
@@ -157,8 +157,9 @@ LEMI120_SENSITIVITY_MV_PER_NT = 200.0  # 200 mV/nT at flat response
 LEMI120_NT_PER_UV = 0.005  # 0.005 nT/μV = (1000 mV/V) / (200 mV/nT) / (1000 μV/mV)
 
 
-def read_uoa_coil_response(calibration_fn: Union[str, Path],
-                           coil_number: Optional[str] = None) -> FrequencyResponseTableFilter:
+def read_uoa_coil_response(
+    calibration_fn: Union[str, Path], coil_number: Optional[str] = None
+) -> FrequencyResponseTableFilter:
     """
     Read LEMI-120 or other coil calibration from .rsp file.
 
@@ -203,7 +204,9 @@ def read_uoa_coil_response(calibration_fn: Union[str, Path],
     fap.frequencies = cal_data[:, 0]  # Hz
     fap.amplitudes = cal_data[:, 1]
     fap.phases = np.deg2rad(cal_data[:, 2])  # Convert degrees to radians
-    fap.name = f"lemi_120_{coil_number}_response" if coil_number else "lemi_120_response"
+    fap.name = (
+        f"lemi_120_{coil_number}_response" if coil_number else "lemi_120_response"
+    )
     fap.type = "frequency response table"
     fap.calibration_date = "1970-01-01T00:00:00+00:00"  # Default
 
@@ -324,7 +327,7 @@ def create_bartington_calibration_filter(component: str) -> CoefficientFilter:
 
     .. note:: This is a linear conversion, frequency-independent.
     """
-    if component == 'hz':
+    if component == "hz":
         # For Bz: expects voltage AFTER divider correction
         gain = BARTINGTON_NT_PER_UV  # 0.007 nT/μV
         comments = (
@@ -349,7 +352,9 @@ def create_bartington_calibration_filter(component: str) -> CoefficientFilter:
     return bart_filter
 
 
-def create_dipole_length_filter(component: str, dipole_length: float) -> CoefficientFilter:
+def create_dipole_length_filter(
+    component: str, dipole_length: float
+) -> CoefficientFilter:
     """
     Create dipole length normalization filter for electric fields.
 
@@ -387,6 +392,7 @@ def create_dipole_length_filter(component: str, dipole_length: float) -> Coeffic
 # EDL Data File Reader
 # ==============================================================================
 
+
 class UoADataReader:
     """
     Reads EDL ASCII data files for a single channel.
@@ -413,10 +419,12 @@ class UoADataReader:
         >>> print(f"Read {len(data)} samples")
     """
 
-    def __init__(self, channel: str, data_path: Path, station_prefix: Optional[str] = None):
+    def __init__(
+        self, channel: str, data_path: Path, station_prefix: Optional[str] = None
+    ):
         self.channel = channel.upper()
         self.data_path = Path(data_path)
-        self.station_prefix = station_prefix or ''
+        self.station_prefix = station_prefix or ""
         self.logger = logger
 
     def find_files(self) -> List[Path]:
@@ -442,14 +450,18 @@ class UoADataReader:
             day_pattern = f"**/{self.station_prefix}*.{self.channel}"
             day_files = sorted(self.data_path.glob(day_pattern))
             if day_files:
-                self.logger.info(f"Found {len(day_files)} files for {self.channel} in day folders")
+                self.logger.info(
+                    f"Found {len(day_files)} files for {self.channel} in day folders"
+                )
                 return day_files
 
             # Pattern 2: Flat directory with timestamped files
             flat_pattern = f"{self.station_prefix}*.{self.channel}"
             flat_files = sorted(self.data_path.glob(flat_pattern))
             if flat_files:
-                self.logger.info(f"Found {len(flat_files)} files for {self.channel} in flat directory")
+                self.logger.info(
+                    f"Found {len(flat_files)} files for {self.channel} in flat directory"
+                )
                 return flat_files
 
             # Pattern 3: Pre-concatenated files (no station prefix)
@@ -457,15 +469,21 @@ class UoADataReader:
             no_prefix_pattern = f"*.{self.channel}"
             no_prefix_files = sorted(self.data_path.glob(no_prefix_pattern))
             if no_prefix_files:
-                self.logger.info(f"Found {len(no_prefix_files)} file(s) for {self.channel} without station prefix")
+                self.logger.info(
+                    f"Found {len(no_prefix_files)} file(s) for {self.channel} without station prefix"
+                )
                 return no_prefix_files
 
         # If data_path is a file, use it directly
         elif self.data_path.is_file():
-            self.logger.info(f"Using specified file for {self.channel}: {self.data_path.name}")
+            self.logger.info(
+                f"Using specified file for {self.channel}: {self.data_path.name}"
+            )
             return [self.data_path]
 
-        self.logger.warning(f"No files found for channel {self.channel} in {self.data_path}")
+        self.logger.warning(
+            f"No files found for channel {self.channel} in {self.data_path}"
+        )
         return []
 
     def read(self) -> np.ndarray:
@@ -512,13 +530,17 @@ class UoADataReader:
 
         # Concatenate all data
         combined = np.concatenate(all_data)
-        self.logger.info(f"Channel {self.channel}: {len(combined)} total samples from {len(files)} file(s)")
+        self.logger.info(
+            f"Channel {self.channel}: {len(combined)} total samples from {len(files)} file(s)"
+        )
 
         return combined
+
 
 # ==============================================================================
 # Main EDL Reader Class
 # ==============================================================================
+
 
 class UoAReader:
     """
@@ -580,33 +602,37 @@ class UoAReader:
         - For accurate E-field, provide actual dipole lengths in meters
     """
 
-    def __init__(self, data_path: Union[str, Path], sensor_type: str = 'bartington', **kwargs):
+    def __init__(
+        self, data_path: Union[str, Path], sensor_type: str = "bartington", **kwargs
+    ):
         self.logger = logger
         self.data_path = Path(data_path)
         self.sensor_type = sensor_type.lower()
 
         # Required parameters
-        self.sample_rate = kwargs.get('sample_rate', None)
+        self.sample_rate = kwargs.get("sample_rate", None)
         if self.sample_rate is None:
-            raise ValueError("sample_rate parameter is required (EDL ASCII files don't contain this info)")
+            raise ValueError(
+                "sample_rate parameter is required (EDL ASCII files don't contain this info)"
+            )
 
         # Station identification
-        self.station_id = kwargs.get('station_id', None)
-        self.station_prefix = kwargs.get('station_prefix', '')
+        self.station_id = kwargs.get("station_id", None)
+        self.station_prefix = kwargs.get("station_prefix", "")
 
         # Dipole lengths for electric field conversion
-        self.dipole_length_ex = kwargs.get('dipole_length_ex', 1.0)
-        self.dipole_length_ey = kwargs.get('dipole_length_ey', 1.0)
+        self.dipole_length_ex = kwargs.get("dipole_length_ex", 1.0)
+        self.dipole_length_ey = kwargs.get("dipole_length_ey", 1.0)
 
         # Calibration files (LEMI-120 mode only)
-        self.calibration_fn_bx = kwargs.get('calibration_fn_bx', None)
-        self.calibration_fn_by = kwargs.get('calibration_fn_by', None)
-        self.calibration_fn_bz = kwargs.get('calibration_fn_bz', None)
+        self.calibration_fn_bx = kwargs.get("calibration_fn_bx", None)
+        self.calibration_fn_by = kwargs.get("calibration_fn_by", None)
+        self.calibration_fn_bz = kwargs.get("calibration_fn_bz", None)
 
         # Optional location metadata
-        self.latitude = kwargs.get('latitude', None)
-        self.longitude = kwargs.get('longitude', None)
-        self.elevation = kwargs.get('elevation', None)
+        self.latitude = kwargs.get("latitude", None)
+        self.longitude = kwargs.get("longitude", None)
+        self.elevation = kwargs.get("elevation", None)
 
         # Data storage
         self.data = None
@@ -627,7 +653,11 @@ class UoAReader:
             return self.station_id
 
         # Use parent directory name
-        return self.data_path.parent.name if self.data_path.is_file() else self.data_path.name
+        return (
+            self.data_path.parent.name
+            if self.data_path.is_file()
+            else self.data_path.name
+        )
 
     def read(self) -> RunTS:
         """
@@ -659,10 +689,12 @@ class UoAReader:
             - Ex, Ey: terminal box gain filter (÷10), then dipole filter
         """
         self.logger.info(f"Reading EDL data from {self.data_path}")
-        self.logger.info(f"Sensor type: {self.sensor_type}, Sample rate: {self.sample_rate} Hz")
+        self.logger.info(
+            f"Sensor type: {self.sensor_type}, Sample rate: {self.sample_rate} Hz"
+        )
 
         # Define MT channels
-        channels = ['BX', 'BY', 'BZ', 'EX', 'EY']
+        channels = ["BX", "BY", "BZ", "EX", "EY"]
         channel_data = {}
 
         # Read each channel
@@ -687,7 +719,9 @@ class UoAReader:
         for channel in channel_data:
             channel_data[channel] = channel_data[channel][:min_length]
 
-        self.logger.info(f"Read {min_length} samples across {len(channel_data)} channels")
+        self.logger.info(
+            f"Read {min_length} samples across {len(channel_data)} channels"
+        )
 
         # Build metadata objects ONCE (reuse pattern from LEMI-423)
         station_meta = self._build_station_metadata()
@@ -724,8 +758,12 @@ class UoAReader:
 
             # Update metadata to reference filters
             if channel_response is not None:
-                ch_metadata.filter.name = [filt.name for filt in channel_response.filters_list]
-                ch_metadata.filter.applied = [False] * len(channel_response.filters_list)
+                ch_metadata.filter.name = [
+                    filt.name for filt in channel_response.filters_list
+                ]
+                ch_metadata.filter.applied = [False] * len(
+                    channel_response.filters_list
+                )
 
             # Create ChannelTS object with RAW data (microvolts)
             ch = ChannelTS(
@@ -770,22 +808,22 @@ class UoAReader:
         """
         filters = []
 
-        if self.sensor_type == 'bartington':
+        if self.sensor_type == "bartington":
             # Bartington Mag-03 fluxgate (long-period)
-            if component == 'hz':
+            if component == "hz":
                 # Bz: needs voltage divider correction first
                 filters.append(create_bz_divider_filter())
 
             # Then Bartington calibration for all components
             filters.append(create_bartington_calibration_filter(component))
 
-        elif self.sensor_type == 'lemi120':
+        elif self.sensor_type == "lemi120":
             # LEMI-120 induction coils (broadband)
             # Load frequency response from .rsp file
             cal_file_map = {
-                'hx': self.calibration_fn_bx,
-                'hy': self.calibration_fn_by,
-                'hz': self.calibration_fn_bz,
+                "hx": self.calibration_fn_bx,
+                "hy": self.calibration_fn_by,
+                "hz": self.calibration_fn_bz,
             }
 
             cal_fn = cal_file_map.get(component)
@@ -838,9 +876,13 @@ class UoAReader:
         filters.append(create_efield_gain_filter())
 
         # Filter 2: Normalize by dipole length
-        dipole_length = self.dipole_length_ex if component == 'ex' else self.dipole_length_ey
+        dipole_length = (
+            self.dipole_length_ex if component == "ex" else self.dipole_length_ey
+        )
         if dipole_length <= 0:
-            self.logger.warning(f"Dipole length for {component} is {dipole_length}m, using 1m")
+            self.logger.warning(
+                f"Dipole length for {component} is {dipole_length}m, using 1m"
+            )
             dipole_length = 1.0
 
         filters.append(create_dipole_length_filter(component, dipole_length))
@@ -883,10 +925,12 @@ class UoAReader:
         # Data logger information
         r.data_logger.model = "PR6-24"
         r.data_logger.manufacturer = "Earth Data"
-        r.data_logger.type = "broadband" if self.sensor_type == 'lemi120' else "long period"
+        r.data_logger.type = (
+            "broadband" if self.sensor_type == "lemi120" else "long period"
+        )
 
         # Data type
-        r.data_type = "MTBB" if self.sensor_type == 'lemi120' else "MTLP"
+        r.data_type = "MTBB" if self.sensor_type == "lemi120" else "MTLP"
 
         return r
 
@@ -908,9 +952,15 @@ class UoAReader:
             ch_metadata.units = "microvolts"
 
             # Sensor information
-            ch_metadata.sensor.manufacturer = "Bartington" if self.sensor_type == 'bartington' else "LEMI"
-            ch_metadata.sensor.model = "Mag-03" if self.sensor_type == 'bartington' else "LEMI-120"
-            ch_metadata.sensor.type = "fluxgate" if self.sensor_type == 'bartington' else "induction coil"
+            ch_metadata.sensor.manufacturer = (
+                "Bartington" if self.sensor_type == "bartington" else "LEMI"
+            )
+            ch_metadata.sensor.model = (
+                "Mag-03" if self.sensor_type == "bartington" else "LEMI-120"
+            )
+            ch_metadata.sensor.type = (
+                "fluxgate" if self.sensor_type == "bartington" else "induction coil"
+            )
 
         else:  # electric
             ch_metadata = Electric()
@@ -938,6 +988,7 @@ class UoAReader:
 # ==============================================================================
 # Convenience Function (Entry Point)
 # ==============================================================================
+
 
 def read_uoa(data_path: Union[str, Path], **kwargs) -> RunTS:
     """

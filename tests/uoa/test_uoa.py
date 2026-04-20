@@ -42,7 +42,7 @@ class TestOrangeBoxDetection(unittest.TestCase):
 
     def test_detect_orange_box_function_exists(self):
         """Test that detect_orange_box function exists in reader module"""
-        from mth5.io.reader import detect_orange_box
+        from mt_io.reader import detect_orange_box
 
         self.assertTrue(callable(detect_orange_box))
 
