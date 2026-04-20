@@ -104,7 +104,7 @@ class TestPR624Reader(unittest.TestCase):
         cls.base_name = "EDL03_041026010000"
 
         # Split data into columns (BX BY BZ EX EY)
-        data = np.loadtxt(pr624_data.strip().split('\n'))
+        data = np.loadtxt(pr624_data.strip().split("\n"))
 
         cls.bx_file = cls.temp_path / f"{cls.base_name}.BX"
         cls.by_file = cls.temp_path / f"{cls.base_name}.BY"
@@ -113,20 +113,20 @@ class TestPR624Reader(unittest.TestCase):
         cls.ey_file = cls.temp_path / f"{cls.base_name}.EY"
 
         # Write each column to its respective file
-        np.savetxt(cls.bx_file, data[:, 0], fmt='%.1f')
-        np.savetxt(cls.by_file, data[:, 1], fmt='%.1f')
-        np.savetxt(cls.bz_file, data[:, 2], fmt='%.1f')
-        np.savetxt(cls.ex_file, data[:, 3], fmt='%.1f')
-        np.savetxt(cls.ey_file, data[:, 4], fmt='%.1f')
+        np.savetxt(cls.bx_file, data[:, 0], fmt="%.1f")
+        np.savetxt(cls.by_file, data[:, 1], fmt="%.1f")
+        np.savetxt(cls.bz_file, data[:, 2], fmt="%.1f")
+        np.savetxt(cls.ex_file, data[:, 3], fmt="%.1f")
+        np.savetxt(cls.ey_file, data[:, 4], fmt="%.1f")
 
         # Read data using read_uoa() function
         cls.run_ts = read_uoa(
             cls.temp_path,
             sample_rate=10.0,
             station_id="TEST001",
-            sensor_type='bartington',
+            sensor_type="bartington",
             dipole_length_ex=50.0,
-            dipole_length_ey=50.0
+            dipole_length_ey=50.0,
         )
 
     @classmethod
@@ -140,13 +140,13 @@ class TestPR624Reader(unittest.TestCase):
 
     def test_channels(self):
         """Test that all channels are present"""
-        expected_channels = ['hx', 'hy', 'hz', 'ex', 'ey']
+        expected_channels = ["hx", "hy", "hz", "ex", "ey"]
         self.assertEqual(sorted(self.run_ts.channels), sorted(expected_channels))
 
     def test_n_samples(self):
         """Test that correct number of samples"""
         # 60 samples in each file
-        self.assertEqual(self.run_ts.dataset.dims["time"], 60)
+        self.assertEqual(self.run_ts.dataset.sizes["time"], 60)
 
     def test_sample_rate(self):
         """Test that sample rate is set correctly"""
@@ -164,10 +164,9 @@ class TestPR624Reader(unittest.TestCase):
         # 60 samples at 10 Hz = 6 seconds duration
         # end = start + (n_samples - 1) / sample_rate
         # = start + 59 / 10 = start + 5.9 seconds
-        from dateutil.parser import parse
-        start = parse(self.run_ts.run_metadata.time_period.start)
-        end = parse(self.run_ts.run_metadata.time_period.end)
-        duration = (end - start).total_seconds()
+        start = self.run_ts.run_metadata.time_period.start
+        end = self.run_ts.run_metadata.time_period.end
+        duration = end - start
         self.assertAlmostEqual(duration, 5.9, places=1)
 
     def test_station_id(self):
@@ -188,24 +187,22 @@ class TestPR624Reader(unittest.TestCase):
 
     def test_data_units_magnetic(self):
         """Test that magnetic channels have microvolt units (RAW)"""
-        self.assertEqual(self.run_ts.hx.channel_metadata.units, "microvolts")
+        self.assertEqual(self.run_ts.hx.channel_metadata.units, "microVolt")
 
     def test_data_units_electric(self):
         """Test that electric channels have microvolt units (RAW)"""
-        self.assertEqual(self.run_ts.ex.channel_metadata.units, "microvolts")
+        self.assertEqual(self.run_ts.ex.channel_metadata.units, "microVolt")
 
     def test_has_filters(self):
         """Test that calibration filters were created"""
         # Should have at least one filter (the calibration filter)
-        self.assertGreater(len(self.run_ts.hx.channel_metadata.filter.applied), 0)
+        self.assertGreater(len(self.run_ts.hx.channel_metadata.filters), 0)
 
     def test_filters_not_applied(self):
         """Test that filters are marked as not applied"""
         # All filters should have applied=False
-        for filter_name in self.run_ts.hx.channel_metadata.filter.applied:
-            self.assertFalse(
-                self.run_ts.hx.channel_metadata.filter.applied[filter_name]
-            )
+        for filt in self.run_ts.hx.channel_metadata.filters:
+            self.assertFalse(filt.applied)
 
 
 class TestPR624ReaderWithLEMI120(unittest.TestCase):
@@ -218,19 +215,19 @@ class TestPR624ReaderWithLEMI120(unittest.TestCase):
         cls.temp_path = Path(cls.temp_dir)
 
         # Use first 3 rows of test data
-        data = np.loadtxt(pr624_data.strip().split('\n'))[:3]
+        data = np.loadtxt(pr624_data.strip().split("\n"))[:3]
 
         cls.bx_file = cls.temp_path / "EDL03_041026010000.BX"
-        np.savetxt(cls.bx_file, data[:, 0], fmt='%.1f')
+        np.savetxt(cls.bx_file, data[:, 0], fmt="%.1f")
 
         # Read data with LEMI-120 sensor type
         cls.run_ts = read_uoa(
             cls.temp_path,
             sample_rate=100.0,  # Broadband rate
             station_id="TEST001",
-            sensor_type='lemi120',
+            sensor_type="lemi120",
             dipole_length_ex=50.0,
-            dipole_length_ey=50.0
+            dipole_length_ey=50.0,
         )
 
     @classmethod
@@ -241,7 +238,7 @@ class TestPR624ReaderWithLEMI120(unittest.TestCase):
     def test_lemi120_sensor_type(self):
         """Test that LEMI-120 sensor type is set"""
         # Check that sensor is LEMI-120 in metadata
-        self.assertIn('lemi', self.run_ts.hx.channel_metadata.sensor.model.lower())
+        self.assertIn("lemi", self.run_ts.hx.channel_metadata.sensor.model.lower())
 
 
 class TestPR624ReaderError(unittest.TestCase):
@@ -253,7 +250,7 @@ class TestPR624ReaderError(unittest.TestCase):
         try:
             # Create a dummy file
             test_file = Path(temp_dir) / "test.BX"
-            with open(test_file, 'w') as f:
+            with open(test_file, "w") as f:
                 f.write("123\n456\n")
 
             # Should raise ValueError
