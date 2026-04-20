@@ -20,8 +20,8 @@ from typing import List
 # =============================================================================
 import pandas as pd
 
-from mth5.io.collection import Collection
-from mth5.io.lemi import LEMI423Reader, LEMI424
+from mt_io.collection import Collection
+from mt_io.lemi import LEMI423Reader, LEMI424
 
 
 # =============================================================================
