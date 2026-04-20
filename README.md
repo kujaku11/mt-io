@@ -7,7 +7,7 @@ This package is meant to be a repository for readers for various magnetotelluric
 | Data Logger | File Type | Reader | Maturity |
 |-------------|-----------|--------|----------|
 | LEMI 424 | txt | Y | medium |
-| LEMI 423 | txt | In progress | weak |
+| LEMI 423 | B423 | Y | medium |
 | LEMI 417 | ? | In progress | weak | 
 | Metronix | atss| Y | medium |
 | Metronix | ats | In progress | weak |
@@ -15,10 +15,23 @@ This package is meant to be a repository for readers for various magnetotelluric
 | NIMS | bin | Y | strong |
 | Phoenix MTU-5C | td_*, JSON, bin | Y | medium |
 | Phoenix MTU-5A | tbl* | Y | medium |
+| UoA PR6-24 | BX, BY, BZ, EX, EY | Y | medium |
+| UoA Orange | binary | Y | medium |
 | USGS ASCII | ascii | Y | medium |
 | ZEN | z3d | Y | strong |
 
 This package will read the data into either a `mt_timeseries.ChannelTS` or a `mt_timeseries.RunTS` object depending on the data included in the file.
+
+## Newer Readers
+
+Recent additions include newer LEMI and University of Adelaide readers:
+
+- `mt_io.lemi.read_lemi423` for LEMI-423 `B423` files
+- `mt_io.lemi.read_lemi424` for LEMI-424 ASCII text files
+- `mt_io.uoa.read_uoa` for PR6-24 Earth Data Logger channel files
+- `mt_io.uoa.read_orange` for legacy Orange Box binary files
+
+These readers return `mt_timeseries.RunTS` objects and are covered by the current test suite.
 
 ## Installation
 

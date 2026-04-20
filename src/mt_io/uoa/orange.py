@@ -75,20 +75,16 @@ License: MIT
 
 """
 
-import logging
+from loguru import logger
 from pathlib import Path
 from typing import Union, List, Optional
 import numpy as np
 import pandas as pd
 from datetime import datetime
 
-from mt_metadata.timeseries import Station, Run, Magnetic, Electric
+from mt_metadata.timeseries import Station, Run, Magnetic, Electric, AppliedFilter
 from mt_metadata.timeseries.filters import CoefficientFilter, ChannelResponse
-from mth5.timeseries import ChannelTS, RunTS
-
-# Setup module logger
-logger = logging.getLogger(__name__ + ".uoa.orange")
-
+from mt_timeseries import ChannelTS, RunTS
 
 # ==============================================================================
 # Hardware Calibration Constants
@@ -96,8 +92,8 @@ logger = logging.getLogger(__name__ + ".uoa.orange")
 
 # ADC characteristics (24-bit sigma-delta, unsigned)
 ADC_BITS = 24
-ADC_MAX_COUNTS = 2 ** 23  # Signed range: ±2^23
-ADC_ZERO = 2 ** 23        # Zero point for unsigned → signed conversion
+ADC_MAX_COUNTS = 2**23  # Signed range: ±2^23
+ADC_ZERO = 2**23  # Zero point for unsigned → signed conversion
 
 # Bartington fluxgate full-scale range
 BARTINGTON_FULL_SCALE_NT = 70000.0  # ±70,000 nT
@@ -114,7 +110,10 @@ NCHANNELS = 8
 # Calibration Filter Creation Functions
 # ==============================================================================
 
-def create_orange_magnetic_filter(component: str, invert: bool = False) -> CoefficientFilter:
+
+def create_orange_magnetic_filter(
+    component: str, invert: bool = False
+) -> CoefficientFilter:
     """
     Create calibration filter for Orange Box magnetic channels.
 
@@ -136,16 +135,18 @@ def create_orange_magnetic_filter(component: str, invert: bool = False) -> Coeff
     """
     mag_filter = CoefficientFilter()
     mag_filter.name = f"orange_magnetic_{component}"
-    mag_filter.units_in = "counts"
+    mag_filter.units_in = "count"
     mag_filter.units_out = "nanotesla"
 
     # Combined gain: (1 / 2^23) × 70000 × (±1 for invert)
-    gain = (BARTINGTON_FULL_SCALE_NT / ADC_MAX_COUNTS)
+    gain = BARTINGTON_FULL_SCALE_NT / ADC_MAX_COUNTS
     if invert:
         gain = -gain
 
     mag_filter.gain = gain
-    mag_filter.offset = -BARTINGTON_FULL_SCALE_NT if not invert else BARTINGTON_FULL_SCALE_NT
+    mag_filter.offset = (
+        -BARTINGTON_FULL_SCALE_NT if not invert else BARTINGTON_FULL_SCALE_NT
+    )
 
     mag_filter.comments = (
         f"Orange Box magnetic calibration: {component.upper()} = "
@@ -157,7 +158,9 @@ def create_orange_magnetic_filter(component: str, invert: bool = False) -> Coeff
     return mag_filter
 
 
-def create_orange_electric_filter(component: str, dipole_length: float) -> CoefficientFilter:
+def create_orange_electric_filter(
+    component: str, dipole_length: float
+) -> CoefficientFilter:
     """
     Create calibration filter for Orange Box electric channels.
 
@@ -180,18 +183,20 @@ def create_orange_electric_filter(component: str, dipole_length: float) -> Coeff
     """
     elec_filter = CoefficientFilter()
     elec_filter.name = f"orange_electric_{component}_{dipole_length}m"
-    elec_filter.units_in = "counts"
-    elec_filter.units_out = "microvolts per meter"
+    elec_filter.units_in = "count"
+    elec_filter.units_out = "microvolt per meter"
 
     # Combined gain: -(1 / 2^23) × (100000 / dipole_length)
     gain = -(ELECTRIC_FULL_SCALE_UV / ADC_MAX_COUNTS) / dipole_length
 
     elec_filter.gain = gain
-    elec_filter.offset = ELECTRIC_FULL_SCALE_UV / dipole_length  # Positive offset due to negative gain
+    elec_filter.offset = (
+        ELECTRIC_FULL_SCALE_UV / dipole_length
+    )  # Positive offset due to negative gain
 
     elec_filter.comments = (
         f"Orange Box electric calibration: {component.upper()} = "
-        f"-((counts / 2^23 - 1.0) × (100000 / {dipole_length}))"
+        f"-((count / 2^23 - 1.0) × (100000 / {dipole_length}))"
     )
 
     return elec_filter
@@ -200,6 +205,7 @@ def create_orange_electric_filter(component: str, dipole_length: float) -> Coeff
 # ==============================================================================
 # Binary File Reader
 # ==============================================================================
+
 
 class OrangeDataReader:
     """
@@ -249,7 +255,9 @@ class OrangeDataReader:
         # Line 2: Date/time string
         line2 = f.readline().decode("ascii", errors="ignore").strip()
         try:
-            self.start_time = pd.to_datetime(line2, format="%a %b %d %H:%M:%S %Y", utc=True)
+            self.start_time = pd.to_datetime(
+                line2, format="%a %b %d %H:%M:%S %Y", utc=True
+            )
         except Exception as e:
             self.logger.warning(f"Could not parse start time '{line2}': {e}")
             self.start_time = None
@@ -299,25 +307,40 @@ class OrangeDataReader:
                 b2 = f.read(1)
                 b3 = f.read(1)
                 if not b1 or not b2 or not b3:
-                    return np.array(samples, dtype=np.int32) if samples else np.array([], dtype=np.int32).reshape(0, 8)
-                counts[i] = (int.from_bytes(b1, byteorder='big') << 16) | \
-                           (int.from_bytes(b2, byteorder='big') << 8) | \
-                            int.from_bytes(b3, byteorder='big')
+                    return (
+                        np.array(samples, dtype=np.int32)
+                        if samples
+                        else np.array([], dtype=np.int32).reshape(0, 8)
+                    )
+                counts[i] = (
+                    (int.from_bytes(b1, byteorder="big") << 16)
+                    | (int.from_bytes(b2, byteorder="big") << 8)
+                    | int.from_bytes(b3, byteorder="big")
+                )
 
             # Read channels 3-4 (2 bytes each, 16-bit)
             for i in range(3, 5):
                 b1 = f.read(1)
                 b2 = f.read(1)
                 if not b1 or not b2:
-                    return np.array(samples, dtype=np.int32) if samples else np.array([], dtype=np.int32).reshape(0, 8)
-                counts[i] = (int.from_bytes(b1, byteorder='big') << 8) | \
-                            int.from_bytes(b2, byteorder='big')
+                    return (
+                        np.array(samples, dtype=np.int32)
+                        if samples
+                        else np.array([], dtype=np.int32).reshape(0, 8)
+                    )
+                counts[i] = (int.from_bytes(b1, byteorder="big") << 8) | int.from_bytes(
+                    b2, byteorder="big"
+                )
 
             # Read channel 5 (1 byte, 8-bit)
             b1 = f.read(1)
             if not b1:
-                return np.array(samples, dtype=np.int32) if samples else np.array([], dtype=np.int32).reshape(0, 8)
-            counts[5] = int.from_bytes(b1, byteorder='big')
+                return (
+                    np.array(samples, dtype=np.int32)
+                    if samples
+                    else np.array([], dtype=np.int32).reshape(0, 8)
+                )
+            counts[5] = int.from_bytes(b1, byteorder="big")
 
             # Read channels 6-7 (3 bytes each, 24-bit)
             for i in range(6, 8):
@@ -325,15 +348,25 @@ class OrangeDataReader:
                 b2 = f.read(1)
                 b3 = f.read(1)
                 if not b1 or not b2 or not b3:
-                    return np.array(samples, dtype=np.int32) if samples else np.array([], dtype=np.int32).reshape(0, 8)
-                counts[i] = (int.from_bytes(b1, byteorder='big') << 16) | \
-                           (int.from_bytes(b2, byteorder='big') << 8) | \
-                            int.from_bytes(b3, byteorder='big')
+                    return (
+                        np.array(samples, dtype=np.int32)
+                        if samples
+                        else np.array([], dtype=np.int32).reshape(0, 8)
+                    )
+                counts[i] = (
+                    (int.from_bytes(b1, byteorder="big") << 16)
+                    | (int.from_bytes(b2, byteorder="big") << 8)
+                    | int.from_bytes(b3, byteorder="big")
+                )
 
             # Read extra byte (padding/sync)
             extra = f.read(1)
             if not extra:
-                return np.array(samples, dtype=np.int32) if samples else np.array([], dtype=np.int32).reshape(0, 8)
+                return (
+                    np.array(samples, dtype=np.int32)
+                    if samples
+                    else np.array([], dtype=np.int32).reshape(0, 8)
+                )
 
             samples.append(counts)
 
@@ -349,23 +382,25 @@ class OrangeDataReader:
         **Note**: Only channels 0, 1, 2, 6, 7 are used (Bx, Bz, By, Ey, Ex).
         Channels 3, 4, 5 are present in file but not used for MT processing.
         """
-        with open(self.file_path, 'rb') as f:
+        with open(self.file_path, "rb") as f:
             header = self.parse_header(f)
             samples = self.read_samples(f)
 
         if samples.size == 0:
             self.logger.warning(f"No samples read from {self.file_path}")
-            return pd.DataFrame(columns=['Bx', 'Bz', 'By', 'Ex', 'Ey'])
+            return pd.DataFrame(columns=["Bx", "Bz", "By", "Ex", "Ey"])
 
         # Extract MT channels (RAW counts, no calibration)
         # Channel mapping: 0=Bx, 1=Bz, 2=By, 6=Ey, 7=Ex
-        df = pd.DataFrame({
-            'Bx': samples[:, 0],  # Channel 0
-            'Bz': samples[:, 1],  # Channel 1
-            'By': samples[:, 2],  # Channel 2
-            'Ey': samples[:, 6],  # Channel 6
-            'Ex': samples[:, 7],  # Channel 7
-        })
+        df = pd.DataFrame(
+            {
+                "Bx": samples[:, 0],  # Channel 0
+                "Bz": samples[:, 1],  # Channel 1
+                "By": samples[:, 2],  # Channel 2
+                "Ey": samples[:, 6],  # Channel 6
+                "Ex": samples[:, 7],  # Channel 7
+            }
+        )
 
         self.logger.info(f"Read {len(df)} samples from {self.file_path.name}")
         return df
@@ -374,6 +409,7 @@ class OrangeDataReader:
 # ==============================================================================
 # Main Reader Class
 # ==============================================================================
+
 
 class OrangeReader:
     """
@@ -405,12 +441,12 @@ class OrangeReader:
 
     def __init__(self, files: Union[str, Path, List[Union[str, Path]]], **kwargs):
         self.files = [Path(f) for f in (files if isinstance(files, list) else [files])]
-        self.station_id = kwargs.get('station_id', 'OrangeBox')
-        self.dipole_length_ex = kwargs.get('dipole_length_ex', 100.0)
-        self.dipole_length_ey = kwargs.get('dipole_length_ey', 100.0)
-        self.latitude = kwargs.get('latitude', 0.0)
-        self.longitude = kwargs.get('longitude', 0.0)
-        self.elevation = kwargs.get('elevation', 0.0)
+        self.station_id = kwargs.get("station_id", "OrangeBox")
+        self.dipole_length_ex = kwargs.get("dipole_length_ex", 100.0)
+        self.dipole_length_ey = kwargs.get("dipole_length_ey", 100.0)
+        self.latitude = kwargs.get("latitude", 0.0)
+        self.longitude = kwargs.get("longitude", 0.0)
+        self.elevation = kwargs.get("elevation", 0.0)
         self.logger = logger
         self.data = None
         self.header = None
@@ -433,9 +469,9 @@ class OrangeReader:
             # Store header from first file
             if self.header is None:
                 self.header = {
-                    'sample_rate': reader.sample_rate,
-                    'start_time': reader.start_time,
-                    'filter_point': reader.filter_point
+                    "sample_rate": reader.sample_rate,
+                    "start_time": reader.start_time,
+                    "filter_point": reader.filter_point,
                 }
                 self.sample_rate = reader.sample_rate
                 self.start_time = reader.start_time
@@ -475,12 +511,14 @@ class OrangeReader:
 
             if ch_type == "magnetic":
                 # Magnetic calibration (invert for hy)
-                invert = (code == "hy")
+                invert = code == "hy"
                 mag_filter = create_orange_magnetic_filter(code, invert=invert)
                 filters_list.append(mag_filter)
             else:  # electric
                 # Electric calibration
-                dipole_length = self.dipole_length_ex if code == "ex" else self.dipole_length_ey
+                dipole_length = (
+                    self.dipole_length_ex if code == "ex" else self.dipole_length_ey
+                )
                 elec_filter = create_orange_electric_filter(code, dipole_length)
                 filters_list.append(elec_filter)
 
@@ -488,8 +526,12 @@ class OrangeReader:
             channel_response = None
             if filters_list:
                 channel_response = ChannelResponse(filters_list=filters_list)
-                ch_metadata.filter.name = [f.name for f in filters_list]
-                ch_metadata.filter.applied = [False] * len(filters_list)
+                for sequence, filter_obj in enumerate(filters_list, start=1):
+                    ch_metadata.add_filter(
+                        AppliedFilter(
+                            name=filter_obj.name, sequence=sequence, applied=False
+                        )
+                    )
 
             # Create ChannelTS object
             ch = ChannelTS(
@@ -548,7 +590,7 @@ class OrangeReader:
         else:
             ch_metadata = Electric()
             ch_metadata.type = "electric"
-            ch_metadata.units = "counts"  # Store RAW counts (MTH5 standard)
+            ch_metadata.units = "count"  # Store RAW counts (MTH5 standard)
 
             azimuth_map = {"ex": 0, "ey": 90}
             ch_metadata.measurement_azimuth = azimuth_map.get(component, 0)
@@ -570,10 +612,8 @@ class OrangeReader:
 # Convenience Function
 # ==============================================================================
 
-def read_orange(
-    data_path: Union[str, Path, List[Union[str, Path]]],
-    **kwargs
-) -> RunTS:
+
+def read_orange(data_path: Union[str, Path, List[Union[str, Path]]], **kwargs) -> RunTS:
     """
     Read Orange Box binary file(s) and return a RunTS.
 
@@ -609,8 +649,9 @@ def read_orange(
     # Handle glob patterns
     if isinstance(data_path, (str, Path)):
         data_path = Path(data_path)
-        if '*' in str(data_path):
+        if "*" in str(data_path):
             from glob import glob
+
             files = sorted(glob(str(data_path)))
             if not files:
                 raise ValueError(f"No files found matching pattern: {data_path}")
