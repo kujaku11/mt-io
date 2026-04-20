@@ -17,7 +17,7 @@ import tempfile
 
 import numpy as np
 
-from mth5.io.uoa import read_uoa
+from mt_io.uoa import read_uoa
 
 # ==============================================================================
 # Create example PR6-24 data (10 Hz sample rate, 60 samples = 6 seconds)
