@@ -16,14 +16,12 @@ import pytest
 
 # Check if pytest-benchmark is available
 try:
-    import pytest_benchmark
     HAS_BENCHMARK = True
 except ImportError:
     HAS_BENCHMARK = False
 from mth5_test_data import get_test_data_path
 
 from mt_io.phoenix.readers.mtu.mtu_table import MTUTable
-
 
 # =============================================================================
 # Fixtures - Session and Module Scope for Parallel Execution Optimization

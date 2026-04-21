@@ -22,7 +22,6 @@ from mt_metadata.timeseries import Station
 
 from mt_io.zen import Z3D, Z3DCollection
 
-
 try:
     import mth5_test_data
 

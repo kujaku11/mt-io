@@ -67,7 +67,6 @@ import pytest
 
 from mt_io.usgs_ascii import USGSasciiCollection
 
-
 try:
     import mth5_test_data
 

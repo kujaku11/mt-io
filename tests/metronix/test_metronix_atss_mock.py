@@ -35,7 +35,6 @@ import pytest
 
 from mt_io.metronix import ATSS, MetronixChannelJSON, MetronixFileNameMetadata
 
-
 try:
     pass
 

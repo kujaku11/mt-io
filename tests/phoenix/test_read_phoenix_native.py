@@ -14,6 +14,7 @@ from collections import OrderedDict
 
 import numpy as np
 import pytest
+from mt_timeseries import ChannelTS
 
 from mt_io.phoenix import open_phoenix
 from mt_io.phoenix.readers.native.native_reader import (
@@ -22,8 +23,6 @@ from mt_io.phoenix.readers.native.native_reader import (
     INSTRUMENT_INPUT_VOLTS,
     NativeReader,
 )
-from mt_timeseries import ChannelTS
-
 
 try:
     import mth5_test_data

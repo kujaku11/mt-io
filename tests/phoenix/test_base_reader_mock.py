@@ -25,7 +25,6 @@ from mt_metadata.timeseries.filters import ChannelResponse
 
 from mt_io.phoenix.readers.base import TSReaderBase
 
-
 try:
     pass
 

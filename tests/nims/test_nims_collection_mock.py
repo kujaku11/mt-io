@@ -19,7 +19,6 @@ import pytest
 
 from mt_io.nims import NIMSCollection
 
-
 try:
     pass
 

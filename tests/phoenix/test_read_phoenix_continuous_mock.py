@@ -23,7 +23,6 @@ from mt_io.phoenix.readers.contiguous.decimated_continuous_reader import (
     DecimatedContinuousReader,
 )
 
-
 try:
     pass
 

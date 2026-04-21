@@ -4,6 +4,7 @@ Created on Tue Apr 18 15:40:28 2023
 
 @author: jpeacock
 """
+
 import datetime
 import shutil
 import string
@@ -19,7 +20,6 @@ import numpy as np
 from loguru import logger
 
 from mt_io.zen import Z3D
-
 
 try:
     import win32api

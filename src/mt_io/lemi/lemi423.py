@@ -14,21 +14,21 @@ Stores RAW counts with calibrations as unapplied filters (MTH5 standard).
 # Imports
 # =============================================================================
 from __future__ import annotations
+
 from pathlib import Path
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from loguru import logger
-
-from mt_timeseries import ChannelTS, RunTS
-from mt_metadata.timeseries import Station, Run, Electric, Magnetic
+from mt_metadata.common import MTime
+from mt_metadata.timeseries import Electric, Magnetic, Run, Station
 from mt_metadata.timeseries.filters import (
-    FrequencyResponseTableFilter,
     ChannelResponse,
     CoefficientFilter,
+    FrequencyResponseTableFilter,
 )
-from mt_metadata.common import MTime
+from mt_timeseries import ChannelTS, RunTS
 
 # File extensions (central dispatcher lower-cases extension)
 B423_EXTS = {"b423"}

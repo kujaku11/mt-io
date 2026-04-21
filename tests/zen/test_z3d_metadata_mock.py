@@ -26,7 +26,6 @@ import pytest
 
 from mt_io.zen import Z3DMetadata
 
-
 try:
     pass
 

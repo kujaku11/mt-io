@@ -22,7 +22,6 @@ from mt_metadata.timeseries import Station
 
 from .helpers import read_json_to_object
 
-
 if TYPE_CHECKING:
     from loguru import Logger
 

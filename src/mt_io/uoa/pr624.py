@@ -104,21 +104,18 @@ Author:
 Date: 2025-11-12
 """
 
-from loguru import logger
 from pathlib import Path
-from typing import Union, List, Dict, Optional
-import numpy as np
-import pandas as pd
-from glob import glob
+from typing import List, Optional, Union
 
-from mt_metadata.timeseries import Station, Run, Magnetic, Electric, AppliedFilter
+import numpy as np
+from loguru import logger
+from mt_metadata.timeseries import AppliedFilter, Electric, Magnetic, Run, Station
 from mt_metadata.timeseries.filters import (
-    FrequencyResponseTableFilter,
     ChannelResponse,
     CoefficientFilter,
+    FrequencyResponseTableFilter,
 )
 from mt_timeseries import ChannelTS, RunTS
-
 
 # ==============================================================================
 # Hardware Calibration Constants

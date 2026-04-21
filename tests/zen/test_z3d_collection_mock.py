@@ -23,7 +23,6 @@ from mt_metadata.timeseries import Station
 from mt_io.zen import Z3D, Z3DCollection
 from mt_io.zen.coil_response import CoilResponse
 
-
 try:
     pass
 

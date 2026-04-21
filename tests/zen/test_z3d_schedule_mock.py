@@ -26,7 +26,6 @@ from mt_metadata.common.mttime import MTime
 
 from mt_io.zen import Z3DSchedule
 
-
 try:
     pass
 

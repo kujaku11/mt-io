@@ -21,7 +21,6 @@ import pytest
 
 from mt_io.nims import NIMS, read_nims
 
-
 try:
     pass
 

@@ -21,7 +21,6 @@ import pytest
 from mt_io.phoenix import PhoenixCollection
 from mt_io.phoenix.readers.calibrations import PhoenixCalibration
 
-
 try:
     import mth5_test_data
 

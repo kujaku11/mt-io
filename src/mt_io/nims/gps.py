@@ -36,6 +36,7 @@ Created
 -------
 Thu Sep  1 11:43:56 2022
 """
+
 # =============================================================================
 # Imports
 # =============================================================================
@@ -519,10 +520,10 @@ class GPS:
                 gps_list[self.type_dict[g_type]["date"]] = None
         elif g_type == "gpgga":
             try:
-                gps_list[
-                    self.type_dict["gpgga"]["elevation"]
-                ] = self._validate_elevation(
-                    gps_list[self.type_dict["gpgga"]["elevation"]]
+                gps_list[self.type_dict["gpgga"]["elevation"]] = (
+                    self._validate_elevation(
+                        gps_list[self.type_dict["gpgga"]["elevation"]]
+                    )
                 )
             except GPSError as error:
                 error_list.append(error.args[0])
