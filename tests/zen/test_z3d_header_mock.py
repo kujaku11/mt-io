@@ -27,7 +27,6 @@ import pytest
 
 from mt_io.zen import Z3DHeader
 
-
 try:
     pass
 

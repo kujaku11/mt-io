@@ -20,10 +20,9 @@ import pandas as pd
 # Imports
 # =============================================================================
 import pytest
-
-from mt_io.usgs_ascii import read_ascii, USGSascii
 from mt_timeseries import ChannelTS, RunTS
 
+from mt_io.usgs_ascii import read_ascii, USGSascii
 
 try:
     import mth5_test_data

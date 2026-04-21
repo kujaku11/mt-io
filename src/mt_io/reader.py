@@ -60,7 +60,6 @@ from loguru import logger
 
 from mt_io import lemi, metronix, miniseed, nims, phoenix, usgs_ascii, zen
 
-
 # =============================================================================
 # Reader registry for MT data formats
 # =============================================================================

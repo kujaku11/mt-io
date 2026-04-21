@@ -12,7 +12,7 @@ Created on Thu Nov 7 16:00:00 2025
 # =============================================================================
 import unittest
 
-from mt_io.uoa import read_uoa, read_orange, UoAReader, OrangeReader
+from mt_io.uoa import OrangeReader, read_orange, read_uoa, UoAReader
 
 # =============================================================================
 

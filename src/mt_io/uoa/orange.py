@@ -75,15 +75,14 @@ License: MIT
 
 """
 
-from loguru import logger
 from pathlib import Path
-from typing import Union, List, Optional
+from typing import List, Union
+
 import numpy as np
 import pandas as pd
-from datetime import datetime
-
-from mt_metadata.timeseries import Station, Run, Magnetic, Electric, AppliedFilter
-from mt_metadata.timeseries.filters import CoefficientFilter, ChannelResponse
+from loguru import logger
+from mt_metadata.timeseries import AppliedFilter, Electric, Magnetic, Run, Station
+from mt_metadata.timeseries.filters import ChannelResponse, CoefficientFilter
 from mt_timeseries import ChannelTS, RunTS
 
 # ==============================================================================

@@ -83,7 +83,6 @@ import pytest
 
 from mt_io.usgs_ascii import AsciiMetadata
 
-
 try:
     import mth5_test_data
 

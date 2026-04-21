@@ -20,7 +20,6 @@ from mt_metadata.common.mttime import MTime
 
 from mt_io.phoenix import open_phoenix
 
-
 try:
     import mth5_test_data
 

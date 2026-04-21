@@ -18,7 +18,6 @@ import pytest
 
 from mt_io.phoenix import open_phoenix
 
-
 try:
     import mth5_test_data
 

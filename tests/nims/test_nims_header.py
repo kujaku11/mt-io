@@ -27,7 +27,6 @@ from mt_metadata.common import Comment, MTime
 from mt_io.nims import NIMSHeader
 from mt_io.nims.header import NIMSError
 
-
 # =============================================================================
 # Test Data Fixtures
 # =============================================================================

@@ -34,6 +34,8 @@ import struct
 from pathlib import Path
 from typing import Any, Optional, Union
 
+import mt_timeseries as timeseries
+
 # =============================================================================
 # Imports
 # =============================================================================
@@ -42,11 +44,9 @@ import pandas as pd
 from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries import Auxiliary, Electric, Magnetic, Run, Station
 
-import mt_timeseries as timeseries
 from mt_io.nims.gps import GPS
 from mt_io.nims.header import NIMSHeader
 from mt_io.nims.response_filters import Response
-
 
 # =============================================================================
 # Exceptions

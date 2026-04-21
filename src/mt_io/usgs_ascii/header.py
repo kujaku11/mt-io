@@ -22,7 +22,6 @@ import numpy as np
 from loguru import logger
 from mt_metadata.timeseries import Electric, Magnetic, Run, Station, Survey
 
-
 # =============================================================================
 #  Metadata for usgs ascii file
 # =============================================================================

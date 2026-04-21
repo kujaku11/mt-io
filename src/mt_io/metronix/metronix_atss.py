@@ -65,10 +65,9 @@ from mt_metadata.timeseries.auxiliary import Auxiliary
 from mt_metadata.timeseries.electric import Electric
 from mt_metadata.timeseries.filters import ChannelResponse
 from mt_metadata.timeseries.magnetic import Magnetic
-
-from mt_io.metronix import MetronixChannelJSON, MetronixFileNameMetadata
 from mt_timeseries import ChannelTS
 
+from mt_io.metronix import MetronixChannelJSON, MetronixFileNameMetadata
 
 # =============================================================================
 

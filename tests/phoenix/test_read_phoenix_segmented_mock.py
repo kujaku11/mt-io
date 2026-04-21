@@ -28,7 +28,6 @@ from mt_io.phoenix.readers.segmented.decimated_segmented_reader import (
     SubHeader,
 )
 
-
 try:
     pass
 

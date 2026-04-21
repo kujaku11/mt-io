@@ -28,7 +28,6 @@ from mt_metadata.timeseries.filters import (
     CoefficientFilter,
     FrequencyResponseTableFilter,
 )
-from mt_timeseries import ChannelTS, RunTS
 
 
 # File extensions (central dispatcher lower-cases extension)

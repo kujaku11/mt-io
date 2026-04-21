@@ -30,7 +30,6 @@ from loguru import logger
 from mt_metadata.timeseries import AppliedFilter, Electric, Magnetic
 from mt_metadata.timeseries.filters import ChannelResponse, FrequencyResponseTableFilter
 
-
 # =============================================================================
 
 
@@ -453,9 +452,7 @@ class MetronixChannelJSON(MetronixFileNameMetadata):
             if not f:
                 continue
             count += 1
-            metadata_object.add_filter(
-                AppliedFilter(name=f, applied=True, stage=count)
-            )
+            metadata_object.add_filter(AppliedFilter(name=f, applied=True, stage=count))
         if sensor_response_filter is not None:
             metadata_object.add_filter(
                 AppliedFilter(

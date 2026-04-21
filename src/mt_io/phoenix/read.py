@@ -21,7 +21,6 @@ from .readers import (
     NativeReader,
 )
 
-
 if TYPE_CHECKING:
     from mt_timeseries import ChannelTS, RunTS
 

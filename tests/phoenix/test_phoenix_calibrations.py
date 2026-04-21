@@ -19,7 +19,6 @@ from mt_metadata.timeseries.filters import FrequencyResponseTableFilter
 
 from mt_io.phoenix.readers import PhoenixCalibration
 
-
 try:
     import mth5_test_data
 

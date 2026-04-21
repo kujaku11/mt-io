@@ -5,6 +5,9 @@ on:
     branches: [ main ]
     paths:
       - '**.py'
+      
+permissions:
+  contents: write  # ← Add this
 
 jobs:
   format:

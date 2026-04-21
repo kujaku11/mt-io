@@ -11,7 +11,6 @@ This module implements Streamed readers for segmented-decimated  time series
 Revised 2022 by J. Peacock
 """
 
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -23,9 +22,9 @@ from typing import Any, BinaryIO
 # =============================================================================
 import numpy as np
 from mt_metadata.common.mttime import MTime
+from mt_timeseries import ChannelTS
 
 from mt_io.phoenix.readers import TSReaderBase
-from mt_timeseries import ChannelTS
 
 
 # =============================================================================

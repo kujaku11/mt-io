@@ -21,11 +21,10 @@ from pathlib import Path
 from struct import unpack, unpack_from
 
 import numpy as np
+from mt_timeseries import ChannelTS
 from numpy.lib.stride_tricks import as_strided
 
 from mt_io.phoenix.readers import TSReaderBase
-from mt_timeseries import ChannelTS
-
 
 AD_IN_AD_UNITS = 0
 AD_INPUT_VOLTS = 1

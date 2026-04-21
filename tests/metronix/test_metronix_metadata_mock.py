@@ -16,7 +16,6 @@ from mt_metadata.timeseries.filters import ChannelResponse, FrequencyResponseTab
 
 from mt_io.metronix import MetronixChannelJSON, MetronixFileNameMetadata
 
-
 try:
     pass
 

@@ -9,6 +9,7 @@ Created on Thu Aug  4 16:48:47 2022
 
 @author: jpeacock
 """
+
 from __future__ import annotations
 
 from collections import OrderedDict
@@ -19,7 +20,6 @@ import pandas as pd
 
 from mt_io import Collection
 from mt_io.phoenix import open_phoenix, PhoenixReceiverMetadata
-
 
 # =============================================================================
 

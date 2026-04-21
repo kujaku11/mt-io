@@ -23,7 +23,6 @@ from mt_metadata.timeseries.filtered import AppliedFilter
 
 from .helpers import read_json_to_object
 
-
 if TYPE_CHECKING:
     pass
 
