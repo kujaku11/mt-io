@@ -19,6 +19,7 @@ from unittest.mock import Mock, patch, PropertyMock
 import numpy as np
 import pytest
 from mt_metadata.common.mttime import MTime
+from mt_timeseries import ChannelTS
 
 from mt_io.phoenix.readers.segmented.decimated_segmented_reader import (
     DecimatedSegmentCollection,
@@ -26,7 +27,6 @@ from mt_io.phoenix.readers.segmented.decimated_segmented_reader import (
     Segment,
     SubHeader,
 )
-from mt_timeseries import ChannelTS
 
 
 try:
@@ -37,9 +37,6 @@ except ImportError:
     HAS_MTH5_TEST_DATA = False
 
 
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 # =============================================================================
 # Fixtures
 # =============================================================================
