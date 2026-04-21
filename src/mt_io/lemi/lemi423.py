@@ -14,21 +14,22 @@ Stores RAW counts with calibrations as unapplied filters (MTH5 standard).
 # Imports
 # =============================================================================
 from __future__ import annotations
+
 from pathlib import Path
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from loguru import logger
-
-from mt_timeseries import ChannelTS, RunTS
-from mt_metadata.timeseries import Station, Run, Electric, Magnetic
+from mt_metadata.common import MTime
+from mt_metadata.timeseries import Electric, Magnetic, Run, Station
 from mt_metadata.timeseries.filters import (
-    FrequencyResponseTableFilter,
     ChannelResponse,
     CoefficientFilter,
+    FrequencyResponseTableFilter,
 )
-from mt_metadata.common import MTime
+from mt_timeseries import ChannelTS, RunTS
+
 
 # File extensions (central dispatcher lower-cases extension)
 B423_EXTS = {"b423"}
@@ -719,6 +720,31 @@ class LEMI423Reader:
             station_metadata=station_meta,  # Reuse cached object
             run_metadata=run_meta,  # Reuse cached object
         )
+
+
+class LEMI120CoilResponse:
+    """Default LEMI-120 coil response using flat unity amplitude and zero phase."""
+
+    def __init__(self):
+        # 57 log-spaced frequency points covering the LEMI-120 range
+        frequencies = np.logspace(-4, np.log10(1001.8), 57)
+        amplitudes = np.ones_like(frequencies)
+        phases = np.zeros_like(frequencies)
+        self._calibration_data = np.column_stack([frequencies, amplitudes, phases])
+
+    def get_coil_response(self, coil_number=None):
+        """Return a FrequencyResponseTableFilter for the LEMI-120 response."""
+        fap = FrequencyResponseTableFilter()
+        fap.frequencies = self._calibration_data[:, 0]
+        fap.amplitudes = self._calibration_data[:, 1]
+        fap.phases = self._calibration_data[:, 2]
+        fap.units_in = "nanotesla"
+        fap.units_out = "mV"
+        fap.type = "frequency response table"
+        fap.name = (
+            f"lemi_120_{coil_number}_response" if coil_number else "lemi_120_response"
+        )
+        return fap
 
 
 def read_lemi423(fn: Union[str, Path, List[Union[str, Path]]], **kwargs) -> RunTS:
