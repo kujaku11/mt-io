@@ -7,11 +7,11 @@ Reads ASCII magnetotelluric data from Earth Data PR6-24 data loggers.
 
 The PR6-24 is a 6-channel broadband/long-period MT system that records
 data as ASCII text files with one file per channel. Each file contains
-voltage samples in microvolts (μV), one value per line.
+voltage samples in microVolt (μV), one value per line.
 
 **File Format**:
     - ASCII text, one sample per line
-    - Units: microvolts (μV)
+    - Units: microVolt (μV)
     - No header (raw sample values only)
     - Typical filename: {STATION}YYMMDDHHMMSS.{CHANNEL}
     - Example: EDL_041020030000.BX
@@ -104,23 +104,20 @@ Author:
 Date: 2025-11-12
 """
 
-import logging
+from loguru import logger
 from pathlib import Path
 from typing import Union, List, Dict, Optional
 import numpy as np
 import pandas as pd
 from glob import glob
 
-from mt_metadata.timeseries import Station, Run, Magnetic, Electric
+from mt_metadata.timeseries import Station, Run, Magnetic, Electric, AppliedFilter
 from mt_metadata.timeseries.filters import (
     FrequencyResponseTableFilter,
     ChannelResponse,
     CoefficientFilter,
 )
 from mt_timeseries import ChannelTS, RunTS
-
-# Setup module logger
-logger = logging.getLogger(__name__ + ".uoa.pr624")
 
 
 # ==============================================================================
@@ -245,8 +242,8 @@ def create_bz_divider_filter() -> CoefficientFilter:
     """
     bz_filter = CoefficientFilter()
     bz_filter.name = "uoa_bz_voltage_divider"
-    bz_filter.units_in = "microvolts"
-    bz_filter.units_out = "microvolts"
+    bz_filter.units_in = "microVolt"
+    bz_filter.units_out = "microVolt"
     bz_filter.gain = BZ_DIVIDER_CORRECTION  # 2.5
     bz_filter.comments = (
         "Bz voltage divider correction: 15kΩ/10kΩ = 0.4 ratio. "
@@ -275,8 +272,8 @@ def create_efield_gain_filter() -> CoefficientFilter:
     """
     efield_filter = CoefficientFilter()
     efield_filter.name = "uoa_efield_terminal_box_gain"
-    efield_filter.units_in = "microvolts"
-    efield_filter.units_out = "microvolts"
+    efield_filter.units_in = "microVolt"
+    efield_filter.units_out = "microVolt"
     efield_filter.gain = 1.0 / E_TERMINAL_BOX_GAIN  # 0.1
     efield_filter.comments = (
         "E-field terminal box gain removal: ×10 hardware pre-amplifier. "
@@ -287,7 +284,7 @@ def create_efield_gain_filter() -> CoefficientFilter:
 
 def create_lemi120_dc_gain_filter(component: str) -> CoefficientFilter:
     """
-    Create LEMI-120 DC gain filter: microvolts → nanotesla.
+    Create LEMI-120 DC gain filter: microVolt → nanotesla.
 
     Applies DC sensitivity of 200 mV/nT = 0.005 nT/μV.
     Only used when .rsp file contains normalized response (nT → nT).
@@ -299,8 +296,8 @@ def create_lemi120_dc_gain_filter(component: str) -> CoefficientFilter:
     """
     dc_filter = CoefficientFilter()
     dc_filter.name = f"lemi120_dc_gain_{component}"
-    dc_filter.units_in = "microvolts"
-    dc_filter.units_out = "nanotesla"
+    dc_filter.units_in = "microVolt"
+    dc_filter.units_out = "nanoTesla"
     dc_filter.gain = LEMI120_NT_PER_UV  # 0.005 nT/μV
     dc_filter.comments = "LEMI-120 DC sensitivity: 200 mV/nT = 0.005 nT/μV"
     return dc_filter
@@ -310,7 +307,7 @@ def create_bartington_calibration_filter(component: str) -> CoefficientFilter:
     """
     Create Bartington Mag-03 fluxgate calibration filter.
 
-    Converts microvolts to nanotesla using manufacturer specifications.
+    Converts microVolt to nanotesla using manufacturer specifications.
 
     :param component: Component name ('hx', 'hy', or 'hz')
     :type component: str
@@ -345,8 +342,8 @@ def create_bartington_calibration_filter(component: str) -> CoefficientFilter:
 
     bart_filter = CoefficientFilter()
     bart_filter.name = f"uoa_bartington_{component}"
-    bart_filter.units_in = "microvolts"
-    bart_filter.units_out = "nanotesla"
+    bart_filter.units_in = "microVolt"
+    bart_filter.units_out = "nanoTesla"
     bart_filter.gain = gain
     bart_filter.comments = comments
     return bart_filter
@@ -358,7 +355,7 @@ def create_dipole_length_filter(
     """
     Create dipole length normalization filter for electric fields.
 
-    Converts microvolts to electric field (mV/km) using dipole length.
+    Converts microVolt to electric field (mV/km) using dipole length.
 
     :param component: Component name ('ex' or 'ey')
     :type component: str
@@ -378,8 +375,8 @@ def create_dipole_length_filter(
 
     dipole_filter = CoefficientFilter()
     dipole_filter.name = f"uoa_dipole_{component}_{dipole_length:.1f}m"
-    dipole_filter.units_in = "microvolts"
-    dipole_filter.units_out = "millivolts per kilometer"
+    dipole_filter.units_in = "microVolt"
+    dipole_filter.units_out = "milliVolt per kilometer"
     dipole_filter.gain = 1000.0 / dipole_length  # Converts μV to mV/km
     dipole_filter.comments = (
         f"Dipole length normalization: {dipole_length}m. "
@@ -490,12 +487,12 @@ class UoADataReader:
         """
         Read and concatenate all files for this channel.
 
-        :return: Array of float values in microvolts (μV)
+        :return: Array of float values in microVolt (μV)
         :rtype: np.ndarray
 
         **File Format**:
             - ASCII text, one sample per line
-            - Values in microvolts (μV)
+            - Values in microVolt (μV)
             - No header
             - Lines with non-numeric content are skipped
 
@@ -663,12 +660,12 @@ class UoAReader:
         """
         Read EDL data files and return a RunTS object.
 
-        - Stores RAW microvolts in data array
+        - Stores RAW microVolt in data array
         - Describes all calibrations as filters with filter.applied = False
 
         Process:
         1. Find and read all 5 MT channels (BX, BY, BZ, EX, EY)
-        2. Store RAW microvolts
+        2. Store RAW microVolt
         3. Build calibration filters based on sensor type
         4. Build metadata objects
         5. Create ChannelTS objects with filters
@@ -744,7 +741,7 @@ class UoAReader:
                 self.logger.warning(f"Channel {src} not found in data")
                 continue
 
-            # Get RAW data in microvolts from ASCII file
+            # Get RAW data in microVolt from ASCII file
             raw_uv = channel_data[src]
 
             # Build channel metadata
@@ -758,17 +755,19 @@ class UoAReader:
 
             # Update metadata to reference filters
             if channel_response is not None:
-                ch_metadata.filter.name = [
-                    filt.name for filt in channel_response.filters_list
-                ]
-                ch_metadata.filter.applied = [False] * len(
-                    channel_response.filters_list
-                )
+                for sequence, filter_obj in enumerate(
+                    channel_response.filters_list, start=1
+                ):
+                    ch_metadata.add_filter(
+                        AppliedFilter(
+                            name=filter_obj.name, sequence=sequence, applied=False
+                        )
+                    )
 
-            # Create ChannelTS object with RAW data (microvolts)
+            # Create ChannelTS object with RAW data (microVolt)
             ch = ChannelTS(
                 channel_type=ch_type,
-                data=raw_uv,  # Store RAW microvolts (NOT calibrated)
+                data=raw_uv,  # Store RAW microVolt (NOT calibrated)
                 channel_metadata=ch_metadata,
                 run_metadata=run_meta,
                 station_metadata=station_meta,
@@ -788,7 +787,7 @@ class UoAReader:
         """
         Create calibration filters for magnetic channels (NOT applied to data).
 
-        Following MTH5 standard: data stays as raw microvolts, filters describe
+        Following MTH5 standard: data stays as raw microVolt, filters describe
         the calibration chain.
 
         :param component: Component name ('hx', 'hy', or 'hz')
@@ -835,7 +834,7 @@ class UoAReader:
                 coil_filter = read_uoa_coil_response(cal_fn, coil_number=component)
 
                 # If .rsp file is normalized (nT → nT), need DC gain filter first
-                if coil_filter.units_in == coil_filter.units_out == "nanotesla":
+                if coil_filter.units_in == coil_filter.units_out == "nanoTesla":
                     filters.append(create_lemi120_dc_gain_filter(component))
 
                 filters.append(coil_filter)
@@ -853,7 +852,7 @@ class UoAReader:
         """
         Create calibration filters for electric channels (NOT applied to data).
 
-        Following MTH5 standard: data stays as raw microvolts, filters describe
+        Following MTH5 standard: data stays as raw microVolt, filters describe
         the calibration chain.
 
         :param component: Component name ('ex' or 'ey')
@@ -930,7 +929,7 @@ class UoAReader:
         )
 
         # Data type
-        r.data_type = "MTBB" if self.sensor_type == "lemi120" else "MTLP"
+        r.data_type = "BBMT" if self.sensor_type == "lemi120" else "LPMT"
 
         return r
 
@@ -948,8 +947,8 @@ class UoAReader:
         if component in ["hx", "hy", "hz"]:
             ch_metadata = Magnetic()
             ch_metadata.type = "magnetic"
-            # Store RAW microvolts (following MTH5 standard like Zen, Phoenix, NIMS)
-            ch_metadata.units = "microvolts"
+            # Store RAW microVolt (following MTH5 standard like Zen, Phoenix, NIMS)
+            ch_metadata.units = "microVolt"
 
             # Sensor information
             ch_metadata.sensor.manufacturer = (
@@ -965,8 +964,8 @@ class UoAReader:
         else:  # electric
             ch_metadata = Electric()
             ch_metadata.type = "electric"
-            # Store RAW microvolts (following MTH5 standard)
-            ch_metadata.units = "microvolts"
+            # Store RAW microVolt (following MTH5 standard)
+            ch_metadata.units = "microVolt"
 
             # Store dipole length in metadata for filter application
             if component == "ex":
