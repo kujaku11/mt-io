@@ -260,7 +260,7 @@ class NIMSCollection(Collection):
         for station in df.station.unique():
             count = 1
             for row in df[df.station == station].sort_values("start").itertuples():
-                if row.run is None:
+                if pd.isna(row.run):
                     df.loc[row.Index, "run"] = f"sr{row.sample_rate}_{count:0{zeros}}"
                 df.loc[row.Index, "sequence_number"] = count
                 count += 1
