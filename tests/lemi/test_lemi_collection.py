@@ -25,7 +25,6 @@ from mt_metadata.common.mttime import MTime
 
 from mt_io.lemi import LEMI417, LEMI424, LEMICollection
 
-
 # ==============================================================================
 # Test Data and Fixtures
 # ==============================================================================
