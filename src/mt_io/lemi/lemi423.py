@@ -29,7 +29,6 @@ from mt_metadata.timeseries.filters import (
     FrequencyResponseTableFilter,
 )
 
-
 # File extensions (central dispatcher lower-cases extension)
 B423_EXTS = {"b423"}
 
