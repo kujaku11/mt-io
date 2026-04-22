@@ -121,7 +121,7 @@ tag = true
 filename = "pyproject.toml"
 
 [[tool.bumpversion.files]]
-filename = "src/__init__.py"
+filename = "src/mt_io/__init__.py"
 
 [[tool.bumpversion.files]]
 filename = "README.md"
