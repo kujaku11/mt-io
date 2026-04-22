@@ -21,7 +21,6 @@ from typing import Any
 
 import numpy as np
 
-
 # supress the future warning from pandas about using datetime parser.
 warnings.simplefilter(action="ignore", category=FutureWarning)
 

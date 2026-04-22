@@ -26,7 +26,6 @@ from mt_metadata.timeseries import Auxiliary, Electric, Magnetic, Run, Station
 from mt_metadata.timeseries.filters import ChannelResponse, FrequencyResponseTableFilter
 from mt_timeseries import ChannelTS, RunTS
 
-
 # =============================================================================
 
 
