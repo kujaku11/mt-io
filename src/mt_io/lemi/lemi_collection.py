@@ -4,7 +4,7 @@ LEMI Collection
 ===============
 
 Collection of LEMI files combined into runs.
-Supports both LEMI-424 (.txt) and LEMI-423 (.B423) instruments.
+Supports LEMI-424 (.txt), LEMI-423 (.B423), and LEMI-417 (.Bxx) instruments.
 
 Created on Wed Aug 31 10:32:44 2022
 
@@ -21,7 +21,8 @@ from typing import List
 import pandas as pd
 
 from mt_io.collection import Collection
-from mt_io.lemi import LEMI423Reader, LEMI424
+from mt_io.lemi import LEMI417, LEMI423Reader, LEMI424
+
 
 # =============================================================================
 
@@ -30,12 +31,14 @@ class LEMICollection(Collection):
     """
     Collection of LEMI files into runs based on start and end times.
 
-    Supports both LEMI-424 (.txt) and LEMI-423 (.B423) instrument files.
+    Supports LEMI-424 (.txt), LEMI-423 (.B423), and LEMI-417 (.Bxx)
+    instrument files.
     Will assign run names as 'sr{sample_rate}_{index:0{zeros}}' --> 'sr1_0001'.
 
     :param file_path: full path to single station LEMI directory
     :type file_path: string or :class`pathlib.Path`
-    :param file_ext: extension of LEMI files, default is ['txt', 'TXT', 'B423', 'b423']
+    :param file_ext: extension of LEMI files, default is
+     ['txt', 'TXT', 'B423', 'b423', 'B*']
     :type file_ext: list of strings
     :param station_id: station id
     :type station_id: string
@@ -50,7 +53,7 @@ class LEMICollection(Collection):
     file_path : str or pathlib.Path, optional
         Full path to single station LEMI424 directory, by default None
     file_ext : list of str, optional
-        Extension of LEMI424 files, by default ["txt", "TXT"]
+        Extensions of LEMI files, by default ["txt", "TXT", "B423", "b423", "B*"]
     **kwargs
         Additional keyword arguments passed to parent Collection class
 
@@ -78,6 +81,9 @@ class LEMICollection(Collection):
         The LEMI-424 instrument operates at:
         - 1 Hz (long period only)
 
+    :LEMI-417 Sample Rates:
+        The LEMI-417 instrument sample rate is detected from file headers.
+
     :Example:
 
     .. code-block:: python
@@ -97,6 +103,10 @@ class LEMICollection(Collection):
         >>>
         >>> # Or if you know the rate was 1000 Hz
         >>> run_dict = lc.get_runs([1000])
+        >>>
+        >>> # LEMI-417 files
+        >>> lc = LEMICollection(r"/path/to/lemi417/station", file_ext=['B*'])
+        >>> run_dict = lc.get_runs([1])
 
     Examples
     --------
@@ -114,7 +124,7 @@ class LEMICollection(Collection):
         **kwargs,
     ) -> None:
         if file_ext is None:
-            file_ext = ["txt", "TXT", "B423", "b423"]
+            file_ext = ["txt", "TXT", "B423", "b423", "B*"]
         super().__init__(file_path=file_path, file_ext=file_ext, **kwargs)
 
         self.station_id = "mt001"
@@ -159,10 +169,11 @@ class LEMICollection(Collection):
         calibration_path: str | Path | None = None,
     ) -> pd.DataFrame:
         """
-        Create a data frame of LEMI files (both .txt and .B423) in a directory.
+        Create a data frame of LEMI files (.txt, .B423, and .Bxx) in a directory.
 
-        Automatically detects file type and uses appropriate reader. For LEMI-423
-        files, sample rate is auto-detected from the tick counter (max_tick + 1).
+        Automatically detects file type and uses appropriate reader.
+        For LEMI-423 files, sample rate is auto-detected from the tick counter
+        (max_tick + 1).
 
         Notes
         -----
@@ -199,6 +210,10 @@ class LEMICollection(Collection):
             >>>
             >>> # Or if you know it was recorded at 1000 Hz
             >>> lemi_df = lc.to_dataframe(sample_rates=[1000])
+            >>>
+            >>> # LEMI-417 files
+            >>> lc = LEMICollection("/path/to/lemi417/station", file_ext=['B*'])
+            >>> lemi_df = lc.to_dataframe(sample_rates=[1])
 
         Examples
         --------
@@ -260,6 +275,25 @@ class LEMICollection(Collection):
                 start = df.index[0].isoformat() if len(df) > 0 else None
                 end = df.index[-1].isoformat() if len(df) > 0 else None
                 components = "hx,hy,hz,ex,ey"  # LEMI-423 always has 5 channels
+
+            elif fn_path.suffix.lower().startswith(".b"):
+                # LEMI-417 reader
+                lemi_obj = LEMI417(fn)
+                lemi_obj.read()
+
+                sample_rate = lemi_obj.sample_rate
+                if sample_rate is None:
+                    self.logger.warning(
+                        f"Could not detect sample rate from {fn}, skipping"
+                    )
+                    continue
+
+                instrument_id = "LEMI417"
+                n_samples = int(lemi_obj.n_samples or 0)
+                file_size = lemi_obj.file_size
+                start = lemi_obj.start.isoformat() if lemi_obj.start else ""
+                end = lemi_obj.end.isoformat() if lemi_obj.end else ""
+                components = ",".join(lemi_obj.run_metadata.channels_recorded_all)
             else:
                 self.logger.warning(f"Unknown file extension for {fn}, skipping")
                 continue

@@ -23,7 +23,8 @@ import pandas as pd
 import pytest
 from mt_metadata.common.mttime import MTime
 
-from mt_io.lemi import LEMI424, LEMICollection
+from mt_io.lemi import LEMI417, LEMI424, LEMICollection
+
 
 # ==============================================================================
 # Test Data and Fixtures
@@ -174,7 +175,7 @@ class TestLEMICollectionInitialization:
         lc = LEMICollection(file_path=temp_dir)
         assert lc.station_id == "mt001"
         assert lc.survey_id == "mt"
-        assert lc.file_ext == ["txt", "TXT", "B423", "b423"]
+        assert lc.file_ext == ["txt", "TXT", "B423", "b423", "B*"]
         assert lc.file_path == temp_dir
 
     def test_init_with_none_file_path(self):
@@ -182,7 +183,7 @@ class TestLEMICollectionInitialization:
         lc = LEMICollection(file_path=None)
         assert lc.station_id == "mt001"
         assert lc.survey_id == "mt"
-        assert lc.file_ext == ["txt", "TXT", "B423", "b423"]
+        assert lc.file_ext == ["txt", "TXT", "B423", "b423", "B*"]
         assert lc.file_path is None
 
     def test_init_with_file_path(self, mock_directory_structure):
@@ -357,6 +358,46 @@ class TestLEMICollectionDataFrameOperations:
         assert all(df["channel_id"] == 1)
         assert all(df["sequence_number"] == 0)
         assert all(df["instrument_id"] == "LEMI-424")
+
+    @patch("mt_io.lemi.lemi_collection.LEMI417")
+    def test_to_dataframe_lemi417_file(self, mock_lemi417_class, tmp_path):
+        """Test LEMI-417 files are handled by the unified collection."""
+        lemi_dir = tmp_path / "lemi417"
+        lemi_dir.mkdir()
+        lemi_fn = lemi_dir / "segment.B05"
+        lemi_fn.write_bytes(b"mock data")
+
+        mock_obj = Mock(spec=LEMI417)
+        mock_obj.n_samples = 160
+        mock_obj.sample_rate = 1.0
+        mock_obj.file_size = 5120
+        mock_obj.start = Mock()
+        mock_obj.start.isoformat.return_value = "2020-10-01T00:00:00+00:00"
+        mock_obj.end = Mock()
+        mock_obj.end.isoformat.return_value = "2020-10-01T00:02:39+00:00"
+        mock_obj.run_metadata = Mock()
+        mock_obj.run_metadata.channels_recorded_all = [
+            "bx",
+            "by",
+            "bz",
+            "e1",
+            "e2",
+            "temperature_e",
+            "temperature_h",
+        ]
+        mock_obj.read = Mock()
+
+        mock_lemi417_class.return_value = mock_obj
+
+        lc = LEMICollection(file_path=lemi_dir, file_ext=["B*"])
+        lc.station_id = "mt01"
+        lc.survey_id = "test"
+        df = lc.to_dataframe(sample_rates=[1])
+
+        assert len(df) == 1
+        assert df.iloc[0]["instrument_id"] == "LEMI417"
+        assert df.iloc[0]["station"] == "mt01"
+        assert df.iloc[0]["survey"] == "test"
 
     def test_set_df_dtypes(self, sample_dataframe, tmp_path):
         """Test _set_df_dtypes method."""
