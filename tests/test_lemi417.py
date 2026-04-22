@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 import pytest
 
-
 # In developer environments where local mth5 is editable, importing mt_timeseries
 # can trigger a circular import through mt_io.reader. A lightweight stub keeps
 # these unit tests isolated from external package import side effects.
