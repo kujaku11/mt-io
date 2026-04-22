@@ -28,6 +28,7 @@ from mt_timeseries import RunTS
 
 from mt_io.lemi import LEMI424, read_lemi424
 
+
 # ==============================================================================
 # Test Data
 # ==============================================================================
@@ -841,8 +842,8 @@ class TestReadLemi424Function:
         file_list = [lemi_test_file, lemi_test_file]
         run_ts = read_lemi424(file_list)
         assert isinstance(run_ts, RunTS)
-        # The actual behavior shows 180 samples (3x60), adjust expectation
-        assert run_ts.dataset.sizes["time"] == 180  # Observed behavior
+        # Correctly reads 2 files (120 samples = 2x60) without duplicating first file
+        assert run_ts.dataset.sizes["time"] == 120
 
     def test_read_with_fast_parameter(self, lemi_test_file):
         """Test reading with fast parameter."""
