@@ -33,7 +33,7 @@ dependencies = [
     "xarray",
     "loguru",
     "mt_metadata>=1.0.0",
-    "mt-timeseries>=0.0.3",
+    "mt-timeseries>=0.0.2",
 ]
 
 [project.urls]
