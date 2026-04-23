@@ -21,10 +21,9 @@ from typing import Any
 
 import numpy as np
 from mt_metadata.common.mttime import MTime
-
-from mt_io.phoenix.readers import TSReaderBase
 from mt_timeseries import ChannelTS
 
+from mt_io.phoenix.readers import TSReaderBase
 
 # =============================================================================
 

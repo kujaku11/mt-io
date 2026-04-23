@@ -19,10 +19,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
-from mt_io.usgs_ascii import AsciiMetadata
 from mt_timeseries import ChannelTS, RunTS
 
+from mt_io.usgs_ascii import AsciiMetadata
 
 # =============================================================================
 #  Metadata for usgs ascii file

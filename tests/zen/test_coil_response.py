@@ -25,7 +25,6 @@ from mt_metadata.timeseries.filters import FrequencyResponseTableFilter
 
 from mt_io.zen.coil_response import CoilResponse
 
-
 # =============================================================================
 # Test Data
 # =============================================================================

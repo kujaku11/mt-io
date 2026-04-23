@@ -24,7 +24,6 @@ from mt_metadata.timeseries.filters import FrequencyResponseTableFilter
 
 from .helpers import read_json_to_object
 
-
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 

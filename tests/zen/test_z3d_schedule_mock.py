@@ -26,7 +26,6 @@ from mt_metadata.common.mttime import MTime
 
 from mt_io.zen import Z3DSchedule
 
-
 try:
     pass
 
@@ -35,9 +34,6 @@ except ImportError:
     HAS_MTH5_TEST_DATA = False
 
 
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 # =============================================================================
 # Fixtures
 # =============================================================================

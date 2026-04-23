@@ -18,7 +18,6 @@ import pandas as pd
 from mt_io.collection import Collection
 from mt_io.usgs_ascii import USGSascii
 
-
 # =============================================================================
 
 

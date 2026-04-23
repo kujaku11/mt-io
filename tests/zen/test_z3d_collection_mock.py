@@ -23,7 +23,6 @@ from mt_metadata.timeseries import Station
 from mt_io.zen import Z3D, Z3DCollection
 from mt_io.zen.coil_response import CoilResponse
 
-
 try:
     pass
 
@@ -32,9 +31,6 @@ except ImportError:
     HAS_MTH5_TEST_DATA = False
 
 
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 # =============================================================================
 # Fixtures
 # =============================================================================
@@ -554,9 +550,15 @@ class TestZ3DCollectionPerformance:
         assert sample_dataframe["file_size"].dtype in [np.int64, np.int32, int]
         assert sample_dataframe["n_samples"].dtype in [np.int64, np.int32, int]
 
-        # String columns should be object type (or category for efficiency)
-        assert sample_dataframe["component"].dtype == object
-        assert sample_dataframe["station"].dtype == object
+        # String columns should be string-like (object or StringDtype)
+        assert (
+            pd.api.types.is_string_dtype(sample_dataframe["component"])
+            or sample_dataframe["component"].dtype == object
+        )
+        assert (
+            pd.api.types.is_string_dtype(sample_dataframe["station"])
+            or sample_dataframe["station"].dtype == object
+        )
 
 
 # =============================================================================

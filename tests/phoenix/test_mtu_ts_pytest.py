@@ -17,7 +17,6 @@ from mth5_test_data import get_test_data_path
 
 from mt_io.phoenix.readers.mtu.mtu_ts import MTUTSN
 
-
 # =============================================================================
 # Session-level fixtures (shared across all tests)
 # =============================================================================

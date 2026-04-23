@@ -23,7 +23,6 @@ from mt_io.phoenix.readers.contiguous.decimated_continuous_reader import (
     DecimatedContinuousReader,
 )
 
-
 try:
     pass
 
@@ -31,10 +30,6 @@ try:
 except ImportError:
     HAS_MTH5_TEST_DATA = False
 
-
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 
 # =============================================================================
 # Fixtures
@@ -350,14 +345,17 @@ class TestDecimatedContinuousReaderInitialization:
         """Test initialization with default parameters."""
         mock_super_init.return_value = None
 
-        with patch.object(
-            DecimatedContinuousReader,
-            "_update_channel_metadata_from_recmeta",
-            return_value=Mock(),
-        ), patch.object(
-            DecimatedContinuousReader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(
+                DecimatedContinuousReader,
+                "_update_channel_metadata_from_recmeta",
+                return_value=Mock(),
+            ),
+            patch.object(
+                DecimatedContinuousReader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             reader = DecimatedContinuousReader(mock_phoenix_file)
 
@@ -377,14 +375,17 @@ class TestDecimatedContinuousReaderInitialization:
         """Test initialization with custom parameters."""
         mock_super_init.return_value = None
 
-        with patch.object(
-            DecimatedContinuousReader,
-            "_update_channel_metadata_from_recmeta",
-            return_value=Mock(),
-        ), patch.object(
-            DecimatedContinuousReader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(
+                DecimatedContinuousReader,
+                "_update_channel_metadata_from_recmeta",
+                return_value=Mock(),
+            ),
+            patch.object(
+                DecimatedContinuousReader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             reader = DecimatedContinuousReader(
                 mock_phoenix_file, num_files=5, report_hw_sat=True, custom_param="test"
@@ -541,12 +542,13 @@ class TestDecimatedContinuousReaderRead:
         mock_decimated_reader.sequence_list = mock_file_sequence[:1]
         mock_data = np.array([1.0, 2.0, 3.0], dtype=np.float32)
 
-        with patch.object(
-            mock_decimated_reader, "read", return_value=mock_data
-        ), patch.object(
-            mock_decimated_reader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(mock_decimated_reader, "read", return_value=mock_data),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             result = mock_decimated_reader.read_sequence()
 
@@ -565,12 +567,13 @@ class TestDecimatedContinuousReaderRead:
             np.array([5.0, 6.0], dtype=np.float32),
         ]
 
-        with patch.object(
-            mock_decimated_reader, "read", side_effect=mock_data_per_file
-        ), patch.object(
-            mock_decimated_reader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(mock_decimated_reader, "read", side_effect=mock_data_per_file),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             result = mock_decimated_reader.read_sequence()
 
@@ -587,12 +590,13 @@ class TestDecimatedContinuousReaderRead:
             np.array([3.0, 4.0], dtype=np.float32),
         ]
 
-        with patch.object(
-            mock_decimated_reader, "read", side_effect=mock_data_per_file
-        ), patch.object(
-            mock_decimated_reader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(mock_decimated_reader, "read", side_effect=mock_data_per_file),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             result = mock_decimated_reader.read_sequence(start=1, end=3)
 
@@ -617,12 +621,13 @@ class TestDecimatedContinuousReaderRead:
         mock_decimated_reader.sequence_list = mock_file_sequence
         mock_data = np.array([1.0, 2.0], dtype=np.float32)
 
-        with patch.object(
-            mock_decimated_reader, "read", return_value=mock_data
-        ), patch.object(
-            mock_decimated_reader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(mock_decimated_reader, "read", return_value=mock_data),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             result = mock_decimated_reader.read_sequence(start=start, end=end)
 
@@ -637,10 +642,13 @@ class TestDecimatedContinuousReaderRead:
         mock_data = np.array([1.0], dtype=np.float32)
         start_time = MTime(time_stamp="2021-04-26T20:24:19+00:00")
 
-        with patch.object(
-            mock_decimated_reader, "read", return_value=mock_data
-        ), patch.object(
-            mock_decimated_reader, "segment_start_time", new_callable=lambda: start_time
+        with (
+            patch.object(mock_decimated_reader, "read", return_value=mock_data),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: start_time,
+            ),
         ):
             mock_decimated_reader.read_sequence()
 
@@ -660,19 +668,24 @@ class TestDecimatedContinuousReaderChannelTS:
         mock_decimated_reader._channel_metadata = mock_metadata
         mock_decimated_reader.channel_metadata = mock_metadata
 
-        with patch.object(
-            mock_decimated_reader, "read_sequence", return_value=mock_data
-        ), patch.object(
-            mock_decimated_reader,
-            "sequence_start",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
-        ), patch.object(
-            mock_decimated_reader,
-            "sequence_end",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:29+00:00"),
-        ), patch(
-            "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
-        ) as mock_channel_ts:
+        with (
+            patch.object(
+                mock_decimated_reader, "read_sequence", return_value=mock_data
+            ),
+            patch.object(
+                mock_decimated_reader,
+                "sequence_start",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
+            patch.object(
+                mock_decimated_reader,
+                "sequence_end",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:29+00:00"),
+            ),
+            patch(
+                "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
+            ) as mock_channel_ts,
+        ):
             mock_decimated_reader.to_channel_ts()
 
             # Verify ChannelTS was called with correct parameters
@@ -697,18 +710,23 @@ class TestDecimatedContinuousReaderChannelTS:
         rxcal_fn = "test_rxcal.json"
         scal_fn = "test_scal.json"
 
-        with patch.object(
-            mock_decimated_reader, "read_sequence", return_value=mock_data
-        ), patch.object(
-            mock_decimated_reader,
-            "sequence_start",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
-        ), patch.object(
-            mock_decimated_reader,
-            "sequence_end",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:29+00:00"),
-        ), patch(
-            "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
+        with (
+            patch.object(
+                mock_decimated_reader, "read_sequence", return_value=mock_data
+            ),
+            patch.object(
+                mock_decimated_reader,
+                "sequence_start",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
+            patch.object(
+                mock_decimated_reader,
+                "sequence_end",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:29+00:00"),
+            ),
+            patch(
+                "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
+            ),
         ):
             mock_decimated_reader.to_channel_ts(rxcal_fn=rxcal_fn, scal_fn=scal_fn)
 
@@ -732,10 +750,13 @@ class TestDecimatedContinuousReaderChannelTS:
 
         # Instead of using patch.object which conflicts with PropertyMock,
         # directly set the attributes and then call the function
-        with patch.object(
-            mock_decimated_reader, "read_sequence", return_value=mock_data
-        ), patch(
-            "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
+        with (
+            patch.object(
+                mock_decimated_reader, "read_sequence", return_value=mock_data
+            ),
+            patch(
+                "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
+            ),
         ):
             # Directly set the expected values before calling to_channel_ts
             mock_decimated_reader.sequence_start = start_time
@@ -795,19 +816,24 @@ class TestDecimatedContinuousReaderChannelTS:
 
         mock_decimated_reader.get_channel_response.return_value = mock_response
 
-        with patch.object(
-            mock_decimated_reader, "read_sequence", return_value=mock_data
-        ), patch.object(
-            mock_decimated_reader,
-            "sequence_start",
-            new_callable=lambda: MTime(time_stamp="2021-04-27T03:24:19+00:00"),
-        ), patch.object(
-            mock_decimated_reader,
-            "sequence_end",
-            new_callable=lambda: MTime(time_stamp="2021-04-27T03:30:23+00:00"),
-        ), patch(
-            "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
-        ) as mock_channel_ts:
+        with (
+            patch.object(
+                mock_decimated_reader, "read_sequence", return_value=mock_data
+            ),
+            patch.object(
+                mock_decimated_reader,
+                "sequence_start",
+                new_callable=lambda: MTime(time_stamp="2021-04-27T03:24:19+00:00"),
+            ),
+            patch.object(
+                mock_decimated_reader,
+                "sequence_end",
+                new_callable=lambda: MTime(time_stamp="2021-04-27T03:30:23+00:00"),
+            ),
+            patch(
+                "mt_io.phoenix.readers.contiguous.decimated_continuous_reader.ChannelTS"
+            ) as mock_channel_ts,
+        ):
             # Mock ChannelTS to have ts attribute with expected size
             mock_ts_instance = Mock()
             mock_ts_instance.ts = Mock()
@@ -909,12 +935,13 @@ class TestDecimatedContinuousReaderPerformance:
         # Mock read to return small arrays to avoid memory issues in test
         small_data = np.array([1.0, 2.0], dtype=np.float32)
 
-        with patch.object(
-            mock_decimated_reader, "read", return_value=small_data
-        ), patch.object(
-            mock_decimated_reader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(mock_decimated_reader, "read", return_value=small_data),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             result = mock_decimated_reader.read_sequence()
 
@@ -928,12 +955,13 @@ class TestDecimatedContinuousReaderPerformance:
         mock_decimated_reader.sequence_list = ["file1.td_150", "file2.td_150"]
         large_data = np.random.rand(10000).astype(np.float32)
 
-        with patch.object(
-            mock_decimated_reader, "read", return_value=large_data
-        ), patch.object(
-            mock_decimated_reader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(mock_decimated_reader, "read", return_value=large_data),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             result = mock_decimated_reader.read_sequence()
 
@@ -1000,12 +1028,13 @@ class TestDecimatedContinuousReaderEdgeCases:
         mock_decimated_reader.sequence_list = ["file1.td_150"]
         empty_data = np.array([], dtype=np.float32)
 
-        with patch.object(
-            mock_decimated_reader, "read", return_value=empty_data
-        ), patch.object(
-            mock_decimated_reader,
-            "segment_start_time",
-            new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+        with (
+            patch.object(mock_decimated_reader, "read", return_value=empty_data),
+            patch.object(
+                mock_decimated_reader,
+                "segment_start_time",
+                new_callable=lambda: MTime(time_stamp="2021-04-26T20:24:19+00:00"),
+            ),
         ):
             result = mock_decimated_reader.read_sequence()
 

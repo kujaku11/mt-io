@@ -11,6 +11,7 @@ Created on Sat Apr  4 12:40:40 2020
 
 @author: peacock
 """
+
 # =============================================================================
 # Imports
 # =============================================================================
@@ -25,7 +26,6 @@ from mt_metadata.timeseries import Station
 from mt_io.collection import Collection
 from mt_io.zen import Z3D
 from mt_io.zen.coil_response import CoilResponse
-
 
 # =============================================================================
 # Collection of Z3D Files

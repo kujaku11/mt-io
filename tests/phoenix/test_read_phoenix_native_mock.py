@@ -18,6 +18,7 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 import pytest
+from mt_timeseries import ChannelTS
 
 from mt_io.phoenix.readers.native.native_reader import (
     AD_IN_AD_UNITS,
@@ -25,20 +26,7 @@ from mt_io.phoenix.readers.native.native_reader import (
     INSTRUMENT_INPUT_VOLTS,
     NativeReader,
 )
-from mt_timeseries import ChannelTS
 
-
-try:
-    pass
-
-    HAS_MTH5_TEST_DATA = True
-except ImportError:
-    HAS_MTH5_TEST_DATA = False
-
-
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 # =============================================================================
 # Fixtures
 # =============================================================================

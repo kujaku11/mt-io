@@ -37,7 +37,6 @@ from mt_metadata.timeseries.filters import (
 from mt_io.nims import Response
 from mt_io.nims.response_filters import ResponseError
 
-
 # =============================================================================
 # Test Data Fixtures
 # =============================================================================

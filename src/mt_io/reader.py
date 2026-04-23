@@ -3,7 +3,7 @@
 Universal reader for magnetotelluric time series data files.
 
 This module provides a plugin-like system for reading various MT data formats
-and returning appropriate :class:`mth5.timeseries` objects. The reader
+and returning appropriate :class:`mt_timeseries` objects. The reader
 automatically detects file types and dispatches to the correct parser.
 
 Plugin Structure
@@ -12,8 +12,8 @@ If you are writing your own reader, implement the following structure:
 
     * Class object that reads the given file format
     * A reader function named read_{file_type} (e.g., read_nims)
-    * Return value should be a :class:`mth5.timeseries.MTTS` or
-      :class:`mth5.timeseries.RunTS` object plus extra metadata as a
+    * Return value should be a :class:`mt_timeseries.MTTS` or
+      :class:`mt_timeseries.RunTS` object plus extra metadata as a
       dictionary with keys formatted as {level.attribute}
 
 Example Implementation
@@ -60,7 +60,6 @@ from loguru import logger
 
 from mt_io import lemi, metronix, miniseed, nims, phoenix, usgs_ascii, zen
 
-
 # =============================================================================
 # Reader registry for MT data formats
 # =============================================================================
@@ -90,7 +89,34 @@ readers: dict[str, dict[str, Any]] = {
 }
 
 
-def get_reader(extension: str) -> tuple[str, Callable]:
+def detect_orange_box(fn):
+    """
+    Check if a .BIN file is an Orange Box file.
+
+    Orange Box files start with ASCII hex sample rate (e.g., " 00008CA0 \n")
+    NIMS files start with ">>>>>>>>>>>>>>>..."
+
+    :param fn: Path to file
+    :return: True if Orange Box, False otherwise
+    """
+    try:
+        with open(fn, "rb") as f:
+            first_line = f.read(20)
+            # Orange Box: starts with space + hex digits
+            # Example: b' 00008CA0 \n' or b' 0000000A \n'
+            if first_line.startswith(b" ") and b"\n" in first_line[:15]:
+                header = first_line[: first_line.find(b"\n")].strip()
+                try:
+                    int(header, 16)  # Try to parse as hex
+                    return True
+                except ValueError:
+                    return False
+    except Exception:
+        pass
+    return False
+
+
+def get_reader(extension: str, fn: str | Path | None = None) -> tuple[str, Callable]:
     """
     Get the appropriate reader function for a file extension.
 
@@ -102,6 +128,10 @@ def get_reader(extension: str) -> tuple[str, Callable]:
     ----------
     extension : str
         File extension (without the dot) to find a reader for
+
+    fn : str or Path, optional
+        Path to the file being read, used for auto-detection of
+        ambiguous formats (e.g., .bin), by default None
 
     Returns
     -------
@@ -126,8 +156,12 @@ def get_reader(extension: str) -> tuple[str, Callable]:
     Some extensions like "bin" are ambiguous and could match multiple
     readers (NIMS or Phoenix). A warning is issued in such cases.
     """
-    if extension in ["bin"]:
-        logger.warning("Suggest inputing file type, bin could be nims or phoenix")
+    # For .bin files, try to auto-detect Orange Box vs NIMS/Phoenix
+    if extension.lower() == "bin" and fn:
+        if detect_orange_box(fn):
+            return "uoa_orange", readers["uoa_orange"]["reader"]
+        logger.warning("Suggest inputting file_type, bin could be nims or phoenix")
+
     for key, vdict in readers.items():
         if extension.lower() in vdict["file_types"]:
             return key, vdict["reader"]
@@ -162,8 +196,8 @@ def read_file(
     -------
     MTTS or RunTS
         Time series object containing the data:
-        - :class:`mth5.timeseries.MTTS` for single channel data
-        - :class:`mth5.timeseries.RunTS` for multi-channel run data
+        - :class:`mt_timeseries.MTTS` for single channel data
+        - :class:`mt_timeseries.RunTS` for multi-channel run data
 
     Raises
     ------
@@ -179,7 +213,7 @@ def read_file(
     Read a single Z3D file (auto-detected)
 
     >>> data = read_file("/path/to/station_001.z3d")
-    >>> print(type(data))  # <class 'mth5.timeseries.ChannelTS'>
+    >>> print(type(data))  # <class 'mt_timeseries.ChannelTS'>
 
     Read with explicit file type for ambiguous extensions
 

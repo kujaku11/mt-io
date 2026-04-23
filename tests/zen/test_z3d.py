@@ -20,7 +20,6 @@ from mt_metadata.timeseries.filters import ChannelResponse, CoefficientFilter
 
 from mt_io.zen import Z3D
 
-
 try:
     import mth5_test_data
 
@@ -1002,8 +1001,9 @@ class TestZ3DUtilityFunctions:
     @pytest.mark.skipif(z3d_data_path is None, reason="mth5_test_data not available")
     def test_read_z3d_function(self):
         """Test standalone read_z3d function."""
-        from mt_io.zen import read_z3d
         from mt_timeseries import ChannelTS
+
+        from mt_io.zen import read_z3d
 
         fn = z3d_data_path / "bm100_20220517_131017_256_EY.Z3D"
         channel_ts = read_z3d(fn)

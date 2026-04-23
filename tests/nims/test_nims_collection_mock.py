@@ -19,7 +19,6 @@ import pytest
 
 from mt_io.nims import NIMSCollection
 
-
 try:
     pass
 
@@ -27,10 +26,6 @@ try:
 except ImportError:
     HAS_MTH5_TEST_DATA = False
 
-
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 
 # =============================================================================
 # Fixtures
@@ -201,12 +196,10 @@ class TestNIMSCollectionDataFrameCreation:
         mock_nims_class.return_value = mock_nims
 
         # Mock the parent class methods
-        with patch.object(
-            nims_collection, "get_empty_entry_dict", return_value={}
-        ), patch.object(
-            nims_collection, "_sort_df", side_effect=lambda df, zeros: df
-        ), patch.object(
-            nims_collection, "_set_df_dtypes", side_effect=lambda df: df
+        with (
+            patch.object(nims_collection, "get_empty_entry_dict", return_value={}),
+            patch.object(nims_collection, "_sort_df", side_effect=lambda df, zeros: df),
+            patch.object(nims_collection, "_set_df_dtypes", side_effect=lambda df: df),
         ):
             df = nims_collection.to_dataframe()
 

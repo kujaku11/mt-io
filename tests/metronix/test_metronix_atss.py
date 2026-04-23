@@ -25,7 +25,6 @@ import pytest
 
 from mt_io.metronix import ATSS, MetronixChannelJSON, MetronixFileNameMetadata
 
-
 # =============================================================================
 # Test Data Import Handling
 # =============================================================================
@@ -556,8 +555,9 @@ class TestATSSUtilityFunction:
     @requires_test_data
     def test_read_atss_function_call(self, sample_magnetic_file):
         """Test calling read_atss function."""
-        from mt_io.metronix import read_atss
         from mt_timeseries import ChannelTS
+
+        from mt_io.metronix import read_atss
 
         result = read_atss(sample_magnetic_file["atss"])
         assert isinstance(result, ChannelTS)

@@ -25,7 +25,6 @@ from mt_metadata.timeseries.filters import ChannelResponse
 
 from mt_io.phoenix.readers.base import TSReaderBase
 
-
 try:
     pass
 
@@ -34,12 +33,8 @@ except ImportError:
     HAS_MTH5_TEST_DATA = False
 
 
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
-
 # =============================================================================
-# Fixtures
+# Test Classes
 # =============================================================================
 
 

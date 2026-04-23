@@ -22,7 +22,6 @@ import pytest
 
 from mt_io.metronix.metronix_collection import MetronixCollection
 
-
 try:
     pass
 
@@ -31,9 +30,6 @@ except ImportError:
     HAS_MTH5_TEST_DATA = False
 
 
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 # =============================================================================
 # Fixtures
 # =============================================================================
@@ -365,8 +361,15 @@ class TestMetronixCollectionDataFrame:
         # Check that _set_df_dtypes was called correctly
         assert pd.api.types.is_datetime64_any_dtype(df["start"])
         assert pd.api.types.is_datetime64_any_dtype(df["end"])
-        assert df["instrument_id"].dtype == "object"
-        assert df["calibration_fn"].dtype == "object"
+        # Check for string-like dtypes (object or StringDtype)
+        assert (
+            pd.api.types.is_string_dtype(df["instrument_id"])
+            or df["instrument_id"].dtype == "object"
+        )
+        assert (
+            pd.api.types.is_string_dtype(df["calibration_fn"])
+            or df["calibration_fn"].dtype == "object"
+        )
 
 
 class TestMetronixCollectionRunNames:

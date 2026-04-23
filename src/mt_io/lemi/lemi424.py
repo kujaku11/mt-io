@@ -8,6 +8,7 @@ Created on Tue May 11 15:31:31 2021
 :license: MIT
 
 """
+
 import json
 import warnings
 from io import StringIO
@@ -20,7 +21,6 @@ from typing import Any
 
 import numpy as np
 
-
 # supress the future warning from pandas about using datetime parser.
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -30,7 +30,6 @@ from loguru import logger
 from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries import Auxiliary, Electric, Magnetic, Run, Station
 from mt_metadata.timeseries.filters import ChannelResponse, FrequencyResponseTableFilter
-
 from mt_timeseries import ChannelTS, RunTS
 
 
@@ -917,8 +916,8 @@ def read_lemi424(
 
     # read a list of files into a single run
     if len(fn) > 1:
-        for txt_file in fn:
+        for txt_file in fn[1:]:
             other = LEMI424(txt_file)
-            other.read()
+            other.read(fast=fast)
             txt_obj += other
     return txt_obj.to_run_ts(e_channels=e_channels, calibration_dict=calibration_dict)

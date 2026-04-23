@@ -18,7 +18,6 @@ import pytest
 
 from mt_io.nims import NIMSCollection
 
-
 try:
     import mth5_test_data
 

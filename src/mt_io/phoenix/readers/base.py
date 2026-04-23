@@ -26,7 +26,6 @@ from .config import PhoenixConfig
 from .header import Header
 from .receiver_metadata import PhoenixReceiverMetadata
 
-
 # =============================================================================
 
 
@@ -528,7 +527,9 @@ class TSReaderBase(Header):
             # Support both newer mt_metadata API (filter_names) and older (filter.name)
             if hasattr(ch_metadata, "filter_names"):
                 filter_names = ch_metadata.filter_names or []
-            elif hasattr(ch_metadata, "filter") and getattr(ch_metadata.filter, "name", None):
+            elif hasattr(ch_metadata, "filter") and getattr(
+                ch_metadata.filter, "name", None
+            ):
                 filter_names = [ch_metadata.filter.name]
             else:
                 filter_names = []

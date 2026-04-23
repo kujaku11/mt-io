@@ -21,7 +21,6 @@ import pytest
 
 from mt_io.nims import NIMS, read_nims
 
-
 try:
     pass
 
@@ -29,10 +28,6 @@ try:
 except ImportError:
     HAS_MTH5_TEST_DATA = False
 
-
-pytestmark = pytest.mark.skipif(
-    HAS_MTH5_TEST_DATA, reason="Skipping mock tests - real data available"
-)
 
 # =============================================================================
 # Test Classes - Simplified

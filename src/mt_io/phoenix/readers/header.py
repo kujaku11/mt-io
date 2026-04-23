@@ -26,7 +26,6 @@ from loguru import logger
 from mt_metadata.common.mttime import MTime
 from mt_metadata.timeseries import Electric, Magnetic, Run, Station
 
-
 if TYPE_CHECKING:
     pass
 
@@ -83,7 +82,9 @@ class Header:
         self.logger: Logger = logger
         self.report_hw_sat: bool = False
         self.header_length: int = 128
-        self.ad_plus_minus_range: float = 5.0  # differential voltage range that the A/D can measure (Board model dependent)
+        self.ad_plus_minus_range: float = (
+            5.0  # differential voltage range that the A/D can measure (Board model dependent)
+        )
         self._header: bytes | None = None
         self._recording_id: int | None = None
         self._channel_id: int | None = None
